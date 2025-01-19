@@ -1,7 +1,10 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    parslet (2.0.0)
     rubyzip (2.4.1)
+    toml (0.3.0)
+      parslet (>= 1.8.0, < 3.0.0)
 
 PLATFORMS
   ruby
@@ -9,6 +12,7 @@ PLATFORMS
 
 DEPENDENCIES
   rubyzip (~> 2.4.1)
+  toml (~> 0.3.0)
 
 BUNDLED WITH
    2.5.22

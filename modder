@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require_relative "src/init"
+require_relative "src/install"
+
+command = ARGV[0]
+
+case command
+when "init"
+  init_cmd
+when "install"
+  install_cmd
+else
+  puts "Unknown command #{command}"
+end

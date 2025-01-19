@@ -1,0 +1,3 @@
+[paths]
+appdata_dir = "~/.local/share/Steam/steamapps/compat"
+steam_dir = "~/.local/share/Steam/steamapps/common/Baldur's Gate 3"

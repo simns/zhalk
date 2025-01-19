@@ -1,3 +1,11 @@
+# IDE related
 .vscode
+
+# Ruby
+.tool-versions
+
+# Used for mods
+conf.toml
 dump
 mods
+mod-data.json
