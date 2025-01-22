@@ -1,6 +1,7 @@
 require "zip"
 require "json"
 require "nokogiri"
+require "toml"
 
 require_relative "common"
 
@@ -8,6 +9,7 @@ def install_cmd
   check_requirements!
 
   mod_data = get_json_data("mod-data.json")
+  config = get_toml_config
 
   Dir.glob(File.join(MODS_DIR, "*.zip")).each do |zip_file_name|
     puts "==== Processing #{zip_file_name} ===="
@@ -66,6 +68,14 @@ def get_xml_data(filename)
   xml_doc = Nokogiri::XML(file, &:noblanks)
   file.close()
   return xml_doc
+end
+
+def get_toml_config
+  if !File.exist?("conf.toml")
+    raise "No conf.toml found. Make sure to run the 'init' command."
+  end
+
+  TOML.load_file("conf.toml")
 end
 
 def extract_mod_files(zip_file_name, mod_name)
