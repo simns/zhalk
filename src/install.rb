@@ -50,13 +50,6 @@ def check_requirements!
   end
 end
 
-def get_json_data(filename)
-  file = File.open(filename)
-  json_data = JSON.load(file)
-  file.close()
-  return json_data
-end
-
 def save_json_data(filename, hash)
   File.open(filename, "w") do |file|
     file.write(hash.to_json)

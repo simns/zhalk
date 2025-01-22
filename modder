@@ -2,6 +2,7 @@
 
 require_relative "src/init"
 require_relative "src/install"
+require_relative "src/list"
 
 command = ARGV[0]
 
@@ -10,6 +11,8 @@ when "init"
   init_cmd
 when "install"
   install_cmd
+when "list"
+  list_cmd
 else
   puts "Unknown command #{command}"
 end

@@ -40,3 +40,10 @@ def safe_open_json(filename)
 
   return data
 end
+
+def get_json_data(filename)
+  file = File.open(filename)
+  json_data = JSON.load(file)
+  file.close()
+  return json_data
+end
