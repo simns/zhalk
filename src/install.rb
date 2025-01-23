@@ -2,11 +2,13 @@ require "zip"
 require "json"
 require "nokogiri"
 require "toml"
+require "date"
 
 require_relative "common"
 
 def install_cmd
   check_requirements!
+  make_modsettings_backup
 
   mod_data = get_json_data("mod-data.json")
   config = get_toml_config
@@ -39,8 +41,12 @@ def install_cmd
         f.write(new_doc.to_xml)
       end
 
+      puts "Wrote data to modsettings.lsx."
+
       update_mod_data(mod_data, mod_name)
     end
+
+    # TODO: Move .pak file
   end
 end
 
@@ -83,6 +89,8 @@ def extract_mod_files(zip_file_name, mod_name)
       zip_file.extract(entry, filepath) { true }
     end
   end
+
+  puts "Extracted zip file."
 end
 
 def insert_into_modsettings(info_json)
@@ -137,9 +145,21 @@ def update_mod_data(mod_data, mod_name)
     mod_data[mod_name] = {
       "is_installed" => true,
       "mod_name" => mod_name,
-      "number" => new_number
+      "number" => new_number,
+      "created_at" => Time.now.to_s,
+      "updated_at" => Time.now.to_s
     }
   end
 
   save_json_data("mod-data.json", mod_data)
+end
+
+def make_modsettings_backup
+  FileUtils.cd("test-dest") do
+    return if File.exist?("modsettings.lsx.bak")
+
+    FileUtils.cp("modsettings.lsx", "modsettings.lsx.bak")
+
+    puts "Made backup of modsettings.lsx file."
+  end
 end

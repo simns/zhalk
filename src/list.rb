@@ -1,5 +1,6 @@
 require "json"
 require "terminal-table"
+require "date"
 
 require_relative "common"
 
@@ -11,12 +12,13 @@ def list_cmd
     [
       entry["number"],
       entry["mod_name"],
-      "March 39th 2003"
+      Time.parse(entry["created_at"]).strftime("%a %b %d, %Y %T"),
+      Time.parse(entry["updated_at"]).strftime("%a %b %d, %Y %T")
     ]
   end
 
   table = Terminal::Table.new do |t|
-    t.headings = ["#", "Name", "Installed at"]
+    t.headings = ["#", "Name", "Installed at", "Updated at"]
     t.rows = mod_entry_rows
     t.style = {
       border_left: false,
