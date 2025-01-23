@@ -8,10 +8,11 @@ require_relative "common"
 
 def install_cmd
   check_requirements!
-  make_modsettings_backup
 
   mod_data = get_json_data("mod-data.json")
   config = get_toml_config
+
+  make_modsettings_backup(config)
 
   Dir.glob(File.join(MODS_DIR, "*.zip")).each do |zip_file_name|
     puts "==== Processing #{zip_file_name} ===="
@@ -154,12 +155,16 @@ def update_mod_data(mod_data, mod_name)
   save_json_data("mod-data.json", mod_data)
 end
 
-def make_modsettings_backup
-  FileUtils.cd("test-dest") do
+def make_modsettings_backup(config)
+  FileUtils.cd(modsettings_dir(config)) do
     return if File.exist?("modsettings.lsx.bak")
 
     FileUtils.cp("modsettings.lsx", "modsettings.lsx.bak")
 
     puts "Made backup of modsettings.lsx file."
   end
+end
+
+def modsettings_dir(config)
+  File.join(config["paths"]["appdata_dir"], "PlayerProfiles", "Public")
 end
