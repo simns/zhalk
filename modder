@@ -3,6 +3,7 @@
 require_relative "src/init"
 require_relative "src/install"
 require_relative "src/list"
+require_relative "src/refresh"
 
 command = ARGV[0]
 
@@ -13,6 +14,8 @@ when "install"
   install_cmd
 when "list"
   list_cmd
+when "refresh"
+  refresh_cmd
 else
   puts "Unknown command #{command}"
 end

@@ -1,4 +1,5 @@
 require "fileutils"
+require "nokogiri"
 
 MODS_DIR = "mods"
 DUMP_DIR = "dump"
@@ -30,20 +31,20 @@ def safe_create(filename, content: "", with_logging: false)
   end
 end
 
-def safe_open_json(filename)
-  data = nil
-  if File.exist?(filename)
-    File.open(filename) do |file|
-      data = JSON.load(file)
-    end
+def get_json_data(filename)
+  File.open(filename) do |file|
+    return JSON.load(file)
   end
-
-  return data
 end
 
-def get_json_data(filename)
-  file = File.open(filename)
-  json_data = JSON.load(file)
-  file.close()
-  return json_data
+def save_json_data(filename, hash)
+  File.open(filename, "w") do |file|
+    file.write(hash.to_json)
+  end
+end
+
+def get_xml_data(filename)
+  File.open(filename) do |file|
+    return Nokogiri::XML(file, &:noblanks)
+  end
 end

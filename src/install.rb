@@ -51,12 +51,6 @@ def check_requirements!
   end
 end
 
-def save_json_data(filename, hash)
-  File.open(filename, "w") do |file|
-    file.write(hash.to_json)
-  end
-end
-
 def get_toml_config
   if !File.exist?("conf.toml")
     raise "No conf.toml found. Make sure to run the 'init' command."

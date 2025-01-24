@@ -1,4 +1,5 @@
 require_relative "common"
+require_relative "refresh"
 
 def init_cmd
   safe_mkdir(MODS_DIR, with_logging: true)
@@ -7,6 +8,8 @@ def init_cmd
   safe_cp("conf.toml.template", "conf.toml", with_logging: true)
 
   safe_create("mod-data.json", content: "{}", with_logging: true)
+
+  refresh_cmd
 
   puts "Done."
 end
