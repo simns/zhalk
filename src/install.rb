@@ -36,15 +36,9 @@ def install_cmd
 
       check_info_json_fields!(info_json)
 
-      new_doc = insert_into_modsettings(info_json)
+      insert_into_modsettings(info_json)
 
-      File.open(File.join("test-dest", "modsettings.lsx"), "w") do |f|
-        f.write(new_doc.to_xml)
-      end
-
-      puts "Wrote data to modsettings.lsx."
-
-      update_mod_data(mod_data, mod_name)
+      update_mod_data(mod_data, mod_name, info_json["Mods"][0]["UUID"])
     end
 
     # TODO: Move .pak file
@@ -99,7 +93,8 @@ def insert_into_modsettings(info_json)
   uuid = info_json["Mods"][0]["UUID"]
 
   if xml_doc.at("attribute#UUID[value='#{uuid}']")
-    raise "Mod entry already exists in modsettings.lsx."
+    puts "WARN: Mod entry already exists in modsettings.lsx."
+    return
   end
 
   builder = Nokogiri::XML::Builder.with(xml_doc.at("node#Mods children")) do |xml|
@@ -112,7 +107,11 @@ def insert_into_modsettings(info_json)
     }
   end
 
-  builder
+  File.open(File.join("test-dest", "modsettings.lsx"), "w") do |f|
+    f.write(builder.to_xml)
+  end
+
+  puts "Wrote data to modsettings.lsx."
 end
 
 def check_info_json_fields!(info_json)
@@ -133,7 +132,7 @@ def check_info_json_fields!(info_json)
   end
 end
 
-def update_mod_data(mod_data, mod_name)
+def update_mod_data(mod_data, mod_name, uuid)
   if mod_data[mod_name]
     mod_data[mod_name]["is_installed"] = true
   else
@@ -146,6 +145,7 @@ def update_mod_data(mod_data, mod_name)
     mod_data[mod_name] = {
       "is_installed" => true,
       "mod_name" => mod_name,
+      "uuid" => uuid,
       "number" => new_number,
       "created_at" => Time.now.to_s,
       "updated_at" => Time.now.to_s
