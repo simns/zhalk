@@ -22,11 +22,6 @@ def install_cmd
       raise "Couldn't get mod name from zip file. Perhaps there are some unrecognized characters."
     end
 
-    if mod_data.dig(mod_name, "is_installed")
-      puts "Mod is marked as installed. Skipping."
-      next
-    end
-
     safe_mkdir(File.join(DUMP_DIR, mod_name))
 
     extract_mod_files(zip_file_name, mod_name)
@@ -36,9 +31,14 @@ def install_cmd
 
       check_info_json_fields!(info_json)
 
+      if mod_data.dig(info_json["Mods"][0]["UUID"], "is_installed")
+        puts "Mod is marked as installed. Skipping."
+        next
+      end
+
       insert_into_modsettings(info_json)
 
-      update_mod_data(mod_data, mod_name, info_json["Mods"][0]["UUID"])
+      update_mod_data(mod_data, info_json)
     end
 
     # TODO: Move .pak file
@@ -55,13 +55,6 @@ def save_json_data(filename, hash)
   File.open(filename, "w") do |file|
     file.write(hash.to_json)
   end
-end
-
-def get_xml_data(filename)
-  file = File.open(filename)
-  xml_doc = Nokogiri::XML(file, &:noblanks)
-  file.close()
-  return xml_doc
 end
 
 def get_toml_config
@@ -132,9 +125,12 @@ def check_info_json_fields!(info_json)
   end
 end
 
-def update_mod_data(mod_data, mod_name, uuid)
-  if mod_data[mod_name]
-    mod_data[mod_name]["is_installed"] = true
+def update_mod_data(mod_data, info_json)
+  uuid = info_json["Mods"][0]["UUID"]
+  name = info_json["Mods"][0]["Name"]
+
+  if mod_data[uuid]
+    mod_data[uuid]["is_installed"] = true
   else
     new_number =
       if mod_data.values.size == 0
@@ -142,9 +138,9 @@ def update_mod_data(mod_data, mod_name, uuid)
       else
         mod_data.values.map { |mod| mod["number"] }.max + 1
       end
-    mod_data[mod_name] = {
+    mod_data[uuid] = {
       "is_installed" => true,
-      "mod_name" => mod_name,
+      "mod_name" => name,
       "uuid" => uuid,
       "number" => new_number,
       "created_at" => Time.now.to_s,
