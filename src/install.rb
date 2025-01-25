@@ -24,8 +24,6 @@ def install_cmd
       raise "Couldn't get mod name from zip file. Perhaps there are some unrecognized characters."
     end
 
-    safe_mkdir(File.join(DUMP_DIR, mod_name))
-
     extract_mod_files(zip_file_name, mod_name)
 
     if File.exist?(File.join(DUMP_DIR, mod_name, "info.json"))
@@ -80,6 +78,8 @@ def extract_mod_files(zip_file_name, mod_name)
     puts "Zip file already extracted. Skipping."
     return
   end
+
+  safe_mkdir(File.join(DUMP_DIR, mod_name))
 
   Zip::File.open(zip_file_name) do |zip_file|
     zip_file.each do |entry|
@@ -167,6 +167,12 @@ def make_modsettings_backup(config)
     FileUtils.cp("modsettings.lsx", "modsettings.lsx.bak")
 
     puts "Made backup of modsettings.lsx file."
+  end
+end
+
+def copy_pak_files(mod_name, config)
+  Dir.glob(File.join(DUMP_DIR, mod_name, "*.pak")).each do |pak_file|
+    safe_cp(pak_file, File.join(config["paths"]["appdata_dir"], "Mods"), with_logging: true)
   end
 end
 
