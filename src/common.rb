@@ -1,5 +1,7 @@
 require "fileutils"
 require "nokogiri"
+require "json"
+require "toml"
 
 MODS_DIR = "mods"
 DUMP_DIR = "dump"

@@ -1,3 +1,4 @@
+require "pp"
 require "fakefs/spec_helpers"
 
 require_relative "../src/common"
@@ -33,13 +34,52 @@ RSpec.describe "common.rb" do
     context "when the dest is a directory" do
       before do
         FileUtils.mkdir("destination")
-        FileUtils.touch("dest-is-a-dir.txt")
+        FileUtils.touch("dest_is_a_dir.txt")
 
-        safe_cp("dest-is-a-dir.txt", "destination")
+        safe_cp("dest_is_a_dir.txt", "destination")
       end
 
       it "copies the file to the destination dir" do
-        expect(File.exist?(File.join("destination", "dest-is-a-dir.txt"))).to be(true)
+        expect(File.exist?("dest_is_a_dir.txt")).to be(true)
+        expect(File.exist?(File.join("destination", "dest_is_a_dir.txt"))).to be(true)
+      end
+    end
+  end
+
+  describe "#safe_create" do
+    context "when no file exists" do
+      before do
+        safe_create("new_file.txt")
+      end
+
+      it "creates the file" do
+        expect(File.exist?("new_file.txt")).to be(true)
+      end
+    end
+  end
+
+  describe "#get_json_data" do
+    context "when the json file exists" do
+      before do
+        File.write("data.json", %q[{"foo": "bar"}])
+      end
+
+      it "loads the json file" do
+        expect(get_json_data("data.json")).to eq({
+          "foo" => "bar",
+        })
+      end
+    end
+  end
+
+  describe "#save_json_data" do
+    context "when json is valid" do
+      before do
+        save_json_data("data.json", { bar: "dat" })
+      end
+
+      it "saves the json" do
+        expect(File.read("data.json")).to eq(%q[{"bar":"dat"}])
       end
     end
   end
