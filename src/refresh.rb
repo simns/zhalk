@@ -6,10 +6,10 @@ def refresh_cmd
   puts "Reading from modsettings.lsx..."
 
   mod_data = get_json_data("mod-data.json")
-  starting_number = mod_data.values.map { |mod| mod["number"] }.max + 1
+  starting_number = (mod_data.values.map { |mod| mod["number"] }.max || 0) + 1
   num_added = 0
 
-  modsettings = get_xml_data(File.join("test-dest", "modsettings.lsx"))
+  modsettings = get_modsettings
   modsettings.css("node#Mods node#ModuleShortDesc").each do |node|
     uuid = node.at("attribute#UUID")["value"]
     name = node.at("attribute#Name")["value"]
@@ -27,7 +27,7 @@ def refresh_cmd
         "uuid" => uuid,
         "number" => starting_number + num_added,
         "created_at" => Time.now.to_s,
-        "updated_at" => Time.now.to_s
+        "updated_at" => Time.now.to_s,
       }
 
       num_added += 1
@@ -37,7 +37,7 @@ def refresh_cmd
   if num_added >= 1
     save_json_data("mod-data.json", mod_data)
 
-    puts "Saved data in mod-data.json."
+    puts "Saved #{num_mods(num_added, "new")} in mod-data.json."
   else
     puts "No new entries."
   end

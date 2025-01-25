@@ -48,3 +48,27 @@ def get_xml_data(filename)
     return Nokogiri::XML(file, &:noblanks)
   end
 end
+
+def modsettings_dir(config = nil)
+  config = get_toml_config if config.nil?
+
+  File.join(config["paths"]["appdata_dir"], "PlayerProfiles", "Public")
+end
+
+def get_modsettings
+  config = get_toml_config
+
+  get_xml_data(File.join(modsettings_dir(config), "modsettings.lsx"))
+end
+
+def get_toml_config
+  if !File.exist?("conf.toml")
+    raise "No conf.toml found. Make sure to run the 'init' command."
+  end
+
+  TOML.load_file("conf.toml")
+end
+
+def num_mods(num, type)
+  num == 1 ? "1 #{type} mod" : "#{num} #{type} mods"
+end
