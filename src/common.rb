@@ -14,11 +14,17 @@ def safe_mkdir(name, with_logging: false)
 end
 
 def safe_cp(src, dest, with_logging: false)
-  if !File.exist?(dest)
-    FileUtils.cp(src, dest)
-    puts "Created file #{dest}." if with_logging
+  updated_dest = dest
+  basename = File.basename(src)
+  if File.directory?(dest)
+    updated_dest = File.join(dest, basename)
+  end
+
+  if !File.exist?(updated_dest)
+    FileUtils.cp(src, updated_dest)
+    puts "Created file #{basename}." if with_logging
   else
-    puts "File #{dest} already exists." if with_logging
+    puts "File #{basename} already exists." if with_logging
   end
 end
 
