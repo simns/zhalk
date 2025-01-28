@@ -211,4 +211,79 @@ EXAMPLE
       end
     end
   end
+
+  describe "#update_mod_data" do
+    context "when mod-data.json is empty" do
+      before do
+        update_mod_data({}, {
+          "Mods" => [
+            {
+              "Author" => "Poopie",
+              "Name" => "Test Mod",
+              "Folder" => "Test Folder",
+              "Version" => "",
+              "Description" => "Example description",
+              "UUID" => "6df04e78-79ba-4c56-aa68-67e843f78ac9",
+              "Created" => "2024-01-01T03:00:00.1238948+09:00",
+              "Dependencies" => [],
+              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
+            },
+          ],
+          "MD5" => "54c3136171518f973ad518b43f3f35ae",
+        })
+      end
+
+      it "saves to mod-data.json" do
+        expect(JSON.parse(File.read("mod-data.json"))).to include({
+          "6df04e78-79ba-4c56-aa68-67e843f78ac9" => hash_including({
+            "is_installed" => true,
+            "mod_name" => "Test Mod",
+            "uuid" => "6df04e78-79ba-4c56-aa68-67e843f78ac9",
+            "number" => 1,
+          }),
+        })
+      end
+    end
+
+    context "when mod-data.json has the target entry as uninstalled" do
+      before do
+        update_mod_data({
+          "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b" => {
+            "is_installed" => false,
+            "mod_name" => "Test Mod",
+            "uuid" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
+            "number" => 1,
+            "created_at" => "2025-01-28 18:15:04 +0900",
+            "updated_at" => "2025-01-28 18:15:04 +0900",
+          },
+        }, {
+          "Mods" => [
+            {
+              "Author" => "Poopie",
+              "Name" => "Test Mod",
+              "Folder" => "Test Folder",
+              "Version" => "",
+              "Description" => "Example description",
+              "UUID" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
+              "Created" => "2024-01-01T03:00:00.1238948+09:00",
+              "Dependencies" => [],
+              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
+            },
+          ],
+          "MD5" => "54c3136171518f973ad518b43f3f35ae",
+        })
+      end
+
+      it "updates the entry to be installed" do
+        expect(JSON.parse(File.read("mod-data.json"))).to include({
+          "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b" => hash_including({
+            "is_installed" => true,
+            "mod_name" => "Test Mod",
+            "uuid" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
+            "number" => 1,
+          }),
+        })
+      end
+    end
+  end
 end
