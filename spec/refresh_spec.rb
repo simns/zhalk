@@ -6,6 +6,11 @@ require_relative "../src/refresh"
 RSpec.describe "refresh.rb" do
   include FakeFS::SpecHelpers
 
+  before do
+    File.write("mod-data.json", "{}")
+    File.write("conf.toml", "")
+  end
+
   describe "#refresh_cmd" do
     context "when there is nothing in the modsettings" do
       before do
@@ -99,8 +104,8 @@ MODSETTINGS
             "is_installed" => true,
             "mod_name" => "Mod to refresh",
             "uuid" => "02a0bea9-a631-4c45-9ffe-5876bb133967",
-            "number" => 1,
-          }),
+            "number" => 1
+          })
         })
         expect(mod_data.keys.size).to eq(1)
       end
@@ -115,8 +120,8 @@ MODSETTINGS
             "uuid" => "1a5432e9-7821-4ef7-a66f-8cf3a11d45f9",
             "number" => 1,
             "created_at" => Time.now.to_s,
-            "updated_at" => Time.now.to_s,
-          },
+            "updated_at" => Time.now.to_s
+          }
         }.to_json)
         File.write("modsettings.lsx",
                    <<-MODSETTINGS
@@ -159,8 +164,8 @@ MODSETTINGS
             "is_installed" => true,
             "mod_name" => "Existing mod",
             "uuid" => "1a5432e9-7821-4ef7-a66f-8cf3a11d45f9",
-            "number" => 1,
-          }),
+            "number" => 1
+          })
         })
         expect(mod_data.keys.size).to eq(1)
       end

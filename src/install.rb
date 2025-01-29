@@ -44,33 +44,19 @@ def install_cmd
 
       installed_mods << {
         name: mod_name,
-        type: :standard,
+        type: :standard
       }
     else
       copy_pak_files(mod_name, config)
 
       installed_mods << {
         name: mod_name,
-        type: :pak_only,
+        type: :pak_only
       }
     end
   end
 
   print_install_report(installed_mods)
-end
-
-def check_requirements!
-  if !File.exist?("mod-data.json")
-    raise "mod-data.json does not exist. Make sure to run the 'init' command."
-  end
-end
-
-def get_toml_config
-  if !File.exist?("conf.toml")
-    raise "No conf.toml found. Make sure to run the 'init' command."
-  end
-
-  TOML.load_file("conf.toml")
 end
 
 def extract_mod_files(zip_file_name, mod_name)
@@ -153,7 +139,7 @@ def update_mod_data(mod_data, info_json)
       "uuid" => uuid,
       "number" => new_number,
       "created_at" => Time.now.to_s,
-      "updated_at" => Time.now.to_s,
+      "updated_at" => Time.now.to_s
     }
   end
 

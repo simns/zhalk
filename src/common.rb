@@ -70,13 +70,18 @@ def get_modsettings
 end
 
 def get_toml_config
-  if !File.exist?("conf.toml")
-    raise "No conf.toml found. Make sure to run the 'init' command."
-  end
-
   TOML.load_file("conf.toml")
 end
 
 def num_mods(num, type)
   num == 1 ? "1 #{type} mod" : "#{num} #{type} mods"
+end
+
+def check_requirements!
+  if !File.exist?("mod-data.json")
+    raise "mod-data.json does not exist. Make sure to run the 'init' command."
+  end
+  if !File.exist?("conf.toml")
+    raise "No conf.toml found. Make sure to run the 'init' command."
+  end
 end

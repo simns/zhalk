@@ -5,6 +5,8 @@ require "date"
 require_relative "common"
 
 def list_cmd
+  check_requirements!
+
   mod_data = get_json_data("mod-data.json")
 
   mod_entries = mod_data.values.sort_by { |mod_entry| mod_entry["number"] }

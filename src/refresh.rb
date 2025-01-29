@@ -3,6 +3,8 @@ require_relative "common"
 GUSTAV_DEV_UUID = "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"
 
 def refresh_cmd
+  check_requirements!
+
   puts "Reading from modsettings.lsx..."
 
   mod_data = get_json_data("mod-data.json")
@@ -27,7 +29,7 @@ def refresh_cmd
         "uuid" => uuid,
         "number" => starting_number + num_added,
         "created_at" => Time.now.to_s,
-        "updated_at" => Time.now.to_s,
+        "updated_at" => Time.now.to_s
       }
 
       num_added += 1
