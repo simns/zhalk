@@ -1,6 +1,7 @@
 require "pp"
 require "fakefs/spec_helpers"
 require "nokogiri"
+require "json"
 
 require_relative "../src/install"
 
@@ -52,10 +53,10 @@ EXAMPLE
               "UUID" => "658ba936-8a5c-40f1-94a6-7bf8d874b66e",
               "Created" => "2024-01-01T03:00:00.1238948+09:00",
               "Dependencies" => [],
-              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
-            },
+              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
+            }
           ],
-          "MD5" => "54c3136171518f973ad518b43f3f35ae",
+          "MD5" => "54c3136171518f973ad518b43f3f35ae"
         })
       end
 
@@ -149,10 +150,10 @@ EXAMPLE
                 "UUID" => "cf5175fb-0a7c-4af3-b51c-14b683a5cb7d",
                 "Created" => "2024-01-01T03:00:00.1238948+09:00",
                 "Dependencies" => [],
-                "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
-              },
+                "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
+              }
             ],
-            "MD5" => "54c3136171518f973ad518b43f3f35ae",
+            "MD5" => "54c3136171518f973ad518b43f3f35ae"
           })
         }.to output("WARN: Mod entry already exists in modsettings.lsx.\n").to_stdout
       end
@@ -169,10 +170,10 @@ EXAMPLE
               "UUID" => "cf5175fb-0a7c-4af3-b51c-14b683a5cb7d",
               "Created" => "2024-01-01T03:00:00.1238948+09:00",
               "Dependencies" => [],
-              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
-            },
+              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
+            }
           ],
-          "MD5" => "54c3136171518f973ad518b43f3f35ae",
+          "MD5" => "54c3136171518f973ad518b43f3f35ae"
         })
 
         expect(File.read("modsettings.lsx")).to eq(
@@ -226,10 +227,10 @@ EXAMPLE
               "UUID" => "6df04e78-79ba-4c56-aa68-67e843f78ac9",
               "Created" => "2024-01-01T03:00:00.1238948+09:00",
               "Dependencies" => [],
-              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
-            },
+              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
+            }
           ],
-          "MD5" => "54c3136171518f973ad518b43f3f35ae",
+          "MD5" => "54c3136171518f973ad518b43f3f35ae"
         })
       end
 
@@ -239,8 +240,8 @@ EXAMPLE
             "is_installed" => true,
             "mod_name" => "Test Mod",
             "uuid" => "6df04e78-79ba-4c56-aa68-67e843f78ac9",
-            "number" => 1,
-          }),
+            "number" => 1
+          })
         })
       end
     end
@@ -254,8 +255,8 @@ EXAMPLE
             "uuid" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
             "number" => 1,
             "created_at" => "2025-01-28 18:15:04 +0900",
-            "updated_at" => "2025-01-28 18:15:04 +0900",
-          },
+            "updated_at" => "2025-01-28 18:15:04 +0900"
+          }
         }, {
           "Mods" => [
             {
@@ -267,10 +268,10 @@ EXAMPLE
               "UUID" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
               "Created" => "2024-01-01T03:00:00.1238948+09:00",
               "Dependencies" => [],
-              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7",
-            },
+              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
+            }
           ],
-          "MD5" => "54c3136171518f973ad518b43f3f35ae",
+          "MD5" => "54c3136171518f973ad518b43f3f35ae"
         })
       end
 
@@ -280,9 +281,92 @@ EXAMPLE
             "is_installed" => true,
             "mod_name" => "Test Mod",
             "uuid" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
-            "number" => 1,
-          }),
+            "number" => 1
+          })
         })
+      end
+    end
+  end
+
+  describe "#install_cmd" do
+    before do
+      File.write("mod-data.json", "{}")
+      File.write("conf.toml",
+                 <<-CONF
+[paths]
+appdata_dir = "."
+steam_dir = "."
+CONF
+      )
+      FileUtils.mkdir_p(File.join("PlayerProfiles", "Public"))
+      File.write(File.join("PlayerProfiles", "Public", "modsettings.lsx"),
+                 <<-MODSETTINGS
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+  <version major="4" minor="7" revision="1" build="300"/>
+  <region id="ModuleSettings">
+    <node id="root">
+      <children>
+        <node id="Mods">
+          <children>
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="GustavDev"/>
+              <attribute id="MD5" type="LSString" value=""/>
+              <attribute id="Name" type="LSString" value="GustavDev"/>
+              <attribute id="PublishHandle" type="uint64" value="0"/>
+              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+              <attribute id="Version64" type="int64" value="36028797018963968"/>
+            </node>
+          </children>
+        </node>
+      </children>
+    </node>
+  </region>
+</save>
+MODSETTINGS
+      )
+      FileUtils.mkdir("mods")
+      FileUtils.mkdir("dump")
+    end
+
+    context "when all necessary files exist" do
+      it "creates a backup of modsettings" do
+        install_cmd
+
+        expect(File.exist?(File.join("PlayerProfiles", "Public", "modsettings.lsx.bak"))).to be(true)
+      end
+
+      context "when there are mods in the 'mods' folder" do
+        before do
+          FileUtils.touch(File.join("mods", "mod1.zip"))
+
+          allow(self).to receive(:extract_mod_files) do
+            FileUtils.mkdir_p(File.join("dump", "mod1"))
+            FileUtils.touch(File.join("dump", "mod1", "mod.pak"))
+            File.write(File.join("dump", "mod1", "info.json"), {
+              "Mods": [
+                {
+                  "Author": "Poopie",
+                  "Name": "Mod 1",
+                  "Folder": "Mod 1",
+                  "Version": "",
+                  "Description": "Mod 1 description",
+                  "UUID": "ce0be3e5-d6c4-4ace-a649-88d1dfdc23ab",
+                  "Created": "2024-01-01T03:00:00.1238948+09:00",
+                  "Dependencies": [],
+                  "Group": "6f19e75b-fb4d-47a5-ae60-1a54726f44ba"
+                }
+              ],
+              "MD5": "ee8a3210df51af3cea80ed82d2d99118"
+            }.to_json)
+          end
+
+          install_cmd
+        end
+
+        it "installs the mods" do
+          # TODO: Check files
+        end
       end
     end
   end

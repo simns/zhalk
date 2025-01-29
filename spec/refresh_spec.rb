@@ -1,5 +1,6 @@
 require "pp"
 require "fakefs/spec_helpers"
+require "json"
 
 require_relative "../src/refresh"
 

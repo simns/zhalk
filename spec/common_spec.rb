@@ -66,7 +66,7 @@ RSpec.describe "common.rb" do
 
       it "loads the json file" do
         expect(get_json_data("data.json")).to eq({
-          "foo" => "bar",
+          "foo" => "bar"
         })
       end
     end

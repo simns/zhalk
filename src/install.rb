@@ -162,10 +162,6 @@ def copy_pak_files(mod_name, config)
   end
 end
 
-def modsettings_dir(config)
-  File.join(config["paths"]["appdata_dir"], "PlayerProfiles", "Public")
-end
-
 def print_install_report(installed_mods)
   if installed_mods.size == 0
     puts "Nothing to do."
