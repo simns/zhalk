@@ -25,8 +25,10 @@ def safe_cp(src, dest, with_logging: false)
   if !File.exist?(updated_dest)
     FileUtils.cp(src, updated_dest)
     puts "Created file #{File.basename(updated_dest)}." if with_logging
+    return true
   else
     puts "File #{File.basename(updated_dest)} already exists." if with_logging
+    return false
   end
 end
 

@@ -47,12 +47,14 @@ def install_cmd
         type: :standard
       }
     else
-      copy_pak_files(mod_name, config)
+      did_copy = copy_pak_files(mod_name, config)
 
-      installed_mods << {
-        name: mod_name,
-        type: :pak_only
-      }
+      if did_copy
+        installed_mods << {
+          name: mod_name,
+          type: :pak_only
+        }
+      end
     end
   end
 
@@ -157,14 +159,21 @@ def make_modsettings_backup(config)
 end
 
 def copy_pak_files(mod_name, config)
+  did_copy = false
   Dir.glob(File.join(DUMP_DIR, mod_name, "*.pak")).each do |pak_file|
-    safe_cp(pak_file, File.join(config["paths"]["appdata_dir"], "Mods"), with_logging: true)
+    did_copy ||= safe_cp(
+      pak_file,
+      File.join(config["paths"]["appdata_dir"], "Mods"),
+      with_logging: true
+    )
   end
+
+  return did_copy
 end
 
 def print_install_report(installed_mods)
   if installed_mods.size == 0
-    puts "Nothing to do."
+    puts "\nNothing to do."
   else
     standard_mods = installed_mods.select { |mod| mod[:type] == :standard }
     pak_only_mods = installed_mods.select { |mod| mod[:type] == :pak_only }
