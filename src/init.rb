@@ -9,7 +9,5 @@ def init_cmd
 
   safe_create("mod-data.json", content: "{}", with_logging: true)
 
-  refresh_cmd
-
   puts "Done."
 end
