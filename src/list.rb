@@ -9,6 +9,12 @@ def list_cmd
 
   mod_data = get_json_data("mod-data.json")
 
+  table = construct_mod_table(mod_data)
+
+  puts table
+end
+
+def construct_mod_table(mod_data)
   mod_entries = mod_data.values.sort_by { |mod_entry| mod_entry["number"] }
   mod_entry_rows = mod_entries.map do |entry|
     [
@@ -30,5 +36,5 @@ def list_cmd
     }
   end
 
-  puts table
+  return table
 end
