@@ -70,6 +70,9 @@ def process_command(command, mod_numbers, mod_objs)
   when "c"
     puts "Cancelling."
     return
+  else
+    puts "Unknown command."
+    return
   end
 
   puts "REUSLT"
