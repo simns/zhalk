@@ -294,12 +294,13 @@ EXAMPLE
       File.write("conf.toml",
                  <<-CONF
 [paths]
-appdata_dir = "."
-steam_dir = "."
+appdata_dir = "appdata"
+steam_dir = "steam"
 CONF
       )
-      FileUtils.mkdir_p(File.join("PlayerProfiles", "Public"))
-      File.write(File.join("PlayerProfiles", "Public", "modsettings.lsx"),
+      FileUtils.mkdir_p(File.join("appdata", "PlayerProfiles", "Public"))
+      FileUtils.mkdir_p(File.join("appdata", "Mods"))
+      File.write(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx"),
                  <<-MODSETTINGS
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
@@ -327,13 +328,15 @@ MODSETTINGS
       )
       FileUtils.mkdir("mods")
       FileUtils.mkdir("dump")
+
+      allow(self).to receive(:puts)
     end
 
     context "when all necessary files exist" do
       it "creates a backup of modsettings" do
         install_cmd
 
-        expect(File.exist?(File.join("PlayerProfiles", "Public", "modsettings.lsx.bak"))).to be(true)
+        expect(File.exist?(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx.bak"))).to be(true)
       end
 
       context "when there are mods in the 'mods' folder" do
@@ -342,7 +345,7 @@ MODSETTINGS
 
           allow(self).to receive(:extract_mod_files) do
             FileUtils.mkdir_p(File.join("dump", "mod1"))
-            FileUtils.touch(File.join("dump", "mod1", "mod.pak"))
+            FileUtils.touch(File.join("dump", "mod1", "mod1.pak"))
             File.write(File.join("dump", "mod1", "info.json"), {
               "Mods": [
                 {
@@ -364,8 +367,57 @@ MODSETTINGS
           install_cmd
         end
 
-        it "installs the mods" do
-          # TODO: Check files
+        it "updates modsettings.lsx" do
+          expect(File.read(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx"))).to eq(
+                                                                                                      <<-MODSETTINGS
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+  <version major="4" minor="7" revision="1" build="300"/>
+  <region id="ModuleSettings">
+    <node id="root">
+      <children>
+        <node id="Mods">
+          <children>
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="GustavDev"/>
+              <attribute id="MD5" type="LSString" value=""/>
+              <attribute id="Name" type="LSString" value="GustavDev"/>
+              <attribute id="PublishHandle" type="uint64" value="0"/>
+              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+              <attribute id="Version64" type="int64" value="36028797018963968"/>
+            </node>
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="Mod 1"/>
+              <attribute id="MD5" type="LSString" value="ee8a3210df51af3cea80ed82d2d99118"/>
+              <attribute id="Name" type="LSString" value="Mod 1"/>
+              <attribute id="UUID" type="guid" value="ce0be3e5-d6c4-4ace-a649-88d1dfdc23ab"/>
+              <attribute id="Version64" type="int64" value=""/>
+            </node>
+          </children>
+        </node>
+      </children>
+    </node>
+  </region>
+</save>
+       MODSETTINGS
+                                                                                                    )
+        end
+
+        it "updates mod-data.json" do
+          mod_data = JSON.parse(File.read("mod-data.json"))
+          expect(mod_data).to include({
+            "ce0be3e5-d6c4-4ace-a649-88d1dfdc23ab" => hash_including({
+              "is_installed" => true,
+              "mod_name" => "Mod 1",
+              "uuid" => "ce0be3e5-d6c4-4ace-a649-88d1dfdc23ab",
+              "number" => 1
+            })
+          })
+          expect(mod_data.keys.size).to eq(1)
+        end
+
+        it "moves the pak files" do
+          expect(File.exist?(File.join("appdata", "Mods", "mod1.pak"))).to be(true)
         end
       end
     end
