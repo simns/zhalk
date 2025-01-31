@@ -46,7 +46,9 @@ def reorder_cmd
 
   command = STDIN.gets.strip
 
-  process_command(command, mod_numbers, mod_data.values)
+  existing_mod_objs = mod_data.values.sort_by { |mod_obj| mod_obj["number"] }
+
+  process_command(command, mod_numbers, existing_mod_objs)
 end
 
 def process_command(command, mod_numbers, mod_objs)
@@ -75,8 +77,9 @@ def process_command(command, mod_numbers, mod_objs)
     return
   end
 
-  puts "REUSLT"
-  puts mod_objs.map { |d| d["mod_name"] }
+  new_mod_data = write_new_mod_data(mod_objs)
+
+  write_new_modsettings(new_mod_data)
 end
 
 def put_after_mod(after_this_mod, mods_to_move, mod_objs)
@@ -97,6 +100,38 @@ def put_after_mod(after_this_mod, mods_to_move, mod_objs)
   end
 
   return true
+end
+
+def write_new_mod_data(mod_objs)
+  mod_data = get_json_data("mod-data.json")
+
+  mod_objs.each_with_index do |mod_obj, index|
+    mod_data[mod_obj["uuid"]]["number"] = index + 1
+  end
+
+  save_json_data("mod-data.json", mod_data)
+
+  return mod_data
+end
+
+def write_new_modsettings(mod_data)
+  modsettings = get_modsettings
+
+  parent_node = modsettings.at("node#Mods children")
+
+  mod_entries = parent_node.css("node").sort_by do |node|
+    uuid = node.at("attribute#UUID")["value"]
+
+    next 0 if uuid == GUSTAV_DEV_UUID
+
+    next mod_data.dig(uuid, "number") || 0
+  end
+
+  parent_node.children = Nokogiri::XML::NodeSet.new(modsettings, mod_entries)
+
+  File.open(File.join(modsettings_dir, "modsettings.lsx"), "w") do |f|
+    f.write(modsettings.to_xml)
+  end
 end
 
 def valid_mod_nums?(mod_numbers)

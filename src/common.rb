@@ -6,6 +6,8 @@ require "toml"
 MODS_DIR = "mods"
 DUMP_DIR = "dump"
 
+GUSTAV_DEV_UUID = "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"
+
 def safe_mkdir(name, with_logging: false)
   if !Dir.exist?(name)
     Dir.mkdir(name)
@@ -49,7 +51,7 @@ end
 
 def save_json_data(filename, hash)
   File.open(filename, "w") do |file|
-    file.write(hash.to_json)
+    file.write(JSON.pretty_generate(hash))
   end
 end
 

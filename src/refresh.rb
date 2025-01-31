@@ -1,7 +1,5 @@
 require_relative "common"
 
-GUSTAV_DEV_UUID = "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"
-
 def refresh_cmd
   check_requirements!
 
