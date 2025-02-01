@@ -9,7 +9,7 @@ def reorder_cmd
   table = construct_mod_table(mod_data)
 
   puts table
-  puts "Select mods by typing a comma-separated list of numbers"
+  puts "Select mods by typing a comma-separated list of numbers."
 
   mod_numbers = STDIN.gets.strip
 
@@ -68,6 +68,10 @@ def process_command(command, mod_numbers, mod_objs)
   when "e"
     mod_objs.insert(-1, *mods_to_move)
   when "a"
+    if mod_numbers.include?(command_parts[1].to_i)
+      puts "The mod you’re placing the others after cannot be part of the moving set. Please choose another."
+      return
+    end
     return if !put_after_mod(command_parts[1], mods_to_move, mod_objs)
   when "c"
     puts "Cancelling."
@@ -111,6 +115,8 @@ def write_new_mod_data(mod_objs)
 
   save_json_data("mod-data.json", mod_data)
 
+  puts "Wrote data to mod-data.json."
+
   return mod_data
 end
 
@@ -132,6 +138,8 @@ def write_new_modsettings(mod_data)
   File.open(File.join(modsettings_dir, "modsettings.lsx"), "w") do |f|
     f.write(modsettings.to_xml)
   end
+
+  puts "Wrote data to modsettings.lsx."
 end
 
 def valid_mod_nums?(mod_numbers)
