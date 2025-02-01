@@ -189,9 +189,10 @@ MODSETTINGS
       end
 
       context "when modsettings.lsx has the same existing mods" do
-        before do
-          File.write("modsettings.lsx",
-                     <<-MODSETTINGS
+        context "when the user selects to move a mod after another mod" do
+          before do
+            File.write("modsettings.lsx",
+                       <<-MODSETTINGS
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -231,33 +232,33 @@ MODSETTINGS
   </region>
 </save>
 MODSETTINGS
-          )
+            )
 
-          allow(STDIN).to receive(:gets).and_return("1", "e")
+            allow(STDIN).to receive(:gets).and_return("1", "e")
 
-          reorder_cmd
-        end
+            reorder_cmd
+          end
 
-        it "modifies mod-data.json to reflect new order" do
-          expect(JSON.parse(File.read("mod-data.json"))).to include({
-            "c366d5f3-2afc-41d0-b4ac-de15257384e0" => hash_including({
-              "is_installed" => true,
-              "mod_name" => "Existing mod",
-              "uuid" => "c366d5f3-2afc-41d0-b4ac-de15257384e0",
-              "number" => 2
-            }),
-            "a8a472fb-e423-4315-b4e3-eeb0cf3af88d" => hash_including({
-              "is_installed" => true,
-              "mod_name" => "Existing mod 2",
-              "uuid" => "a8a472fb-e423-4315-b4e3-eeb0cf3af88d",
-              "number" => 1
+          it "modifies mod-data.json to reflect new order" do
+            expect(JSON.parse(File.read("mod-data.json"))).to include({
+              "c366d5f3-2afc-41d0-b4ac-de15257384e0" => hash_including({
+                "is_installed" => true,
+                "mod_name" => "Existing mod",
+                "uuid" => "c366d5f3-2afc-41d0-b4ac-de15257384e0",
+                "number" => 2
+              }),
+              "a8a472fb-e423-4315-b4e3-eeb0cf3af88d" => hash_including({
+                "is_installed" => true,
+                "mod_name" => "Existing mod 2",
+                "uuid" => "a8a472fb-e423-4315-b4e3-eeb0cf3af88d",
+                "number" => 1
+              })
             })
-          })
-        end
+          end
 
-        it "modifies modsettings.lsx to reflect new order" do
-          expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-MODSETTINGS
+          it "modifies modsettings.lsx to reflect new order" do
+            expect(File.read("modsettings.lsx")).to eq(
+                                                      <<-MODSETTINGS
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -297,7 +298,65 @@ MODSETTINGS
   </region>
 </save>
 MODSETTINGS
-                                                  )
+                                                    )
+          end
+        end
+
+        context "when the user incorrectly selects a mod to move after" do
+          before do
+            File.write("modsettings.lsx",
+                       <<-MODSETTINGS
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+  <version major="4" minor="7" revision="1" build="300"/>
+  <region id="ModuleSettings">
+    <node id="root">
+      <children>
+        <node id="Mods">
+          <children>
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="GustavDev"/>
+              <attribute id="MD5" type="LSString" value=""/>
+              <attribute id="Name" type="LSString" value="GustavDev"/>
+              <attribute id="PublishHandle" type="uint64" value="0"/>
+              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+              <attribute id="Version64" type="int64" value="36028797018963968"/>
+            </node>
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="Existing mod"/>
+              <attribute id="MD5" type="LSString" value=""/>
+              <attribute id="Name" type="LSString" value="Existing mod"/>
+              <attribute id="PublishHandle" type="uint64" value="0"/>
+              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
+              <attribute id="Version64" type="int64" value=""/>
+            </node>
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
+              <attribute id="MD5" type="LSString" value=""/>
+              <attribute id="Name" type="LSString" value="Existing mod 2"/>
+              <attribute id="PublishHandle" type="uint64" value="0"/>
+              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
+              <attribute id="Version64" type="int64" value=""/>
+            </node>
+          </children>
+        </node>
+      </children>
+    </node>
+  </region>
+</save>
+MODSETTINGS
+            )
+
+            allow(STDIN).to receive(:gets).and_return("1,2", "a 2")
+          end
+
+          it "stops before writing any data to the files" do
+            expect(self).to_not receive(:put_after_mod)
+            expect(self).to_not receive(:write_new_mod_data)
+            expect(self).to_not receive(:write_new_modsettings)
+
+            reorder_cmd
+          end
         end
       end
 
