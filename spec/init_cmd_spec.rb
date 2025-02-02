@@ -1,22 +1,23 @@
 require "pp"
 require "fakefs/spec_helpers"
 
-require_relative "../src/init"
+require_relative "../src/init_cmd"
 
-RSpec.describe "init.rb" do
+RSpec.describe InitCmd do
   include FakeFS::SpecHelpers
 
-  describe "#init_cmd" do
+  describe "#run" do
+    let(:init_cmd) { InitCmd.new }
+
     before do
-      allow(self).to receive(:puts)
-      allow(self).to receive(:refresh_cmd)
+      allow(init_cmd).to receive(:puts)
+
+      FileUtils.touch("conf.toml.template")
     end
 
     context "when no init items are present" do
       before do
-        FileUtils.touch("conf.toml.template")
-
-        init_cmd
+        init_cmd.run
       end
 
       it "creates the init files" do
@@ -29,7 +30,6 @@ RSpec.describe "init.rb" do
 
     context "when all init items are present" do
       before do
-        FileUtils.touch("conf.toml.template")
         FileUtils.touch("conf.toml")
 
         FileUtils.mkdir("mods")
@@ -37,7 +37,7 @@ RSpec.describe "init.rb" do
 
         File.write("mod-data.json", "{}")
 
-        init_cmd
+        init_cmd.run
       end
 
       it "creates nothing" do

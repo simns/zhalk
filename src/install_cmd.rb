@@ -7,6 +7,8 @@ require_relative "helpers/constants"
 
 class InstallCmd < BaseCmd
   def run
+    self.check_requirements!
+
     self.make_modsettings_backup
 
     installed_mods = []

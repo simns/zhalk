@@ -3,13 +3,29 @@ require "fakefs/spec_helpers"
 require "nokogiri"
 require "json"
 
-require_relative "../src/install"
+require_relative "../src/install_cmd"
+require_relative "../src/helpers/modsettings_helper"
+require_relative "../src/helpers/config_helper"
+require_relative "../src/helpers/info_json_helper"
 
-RSpec.describe "install.rb" do
+RSpec.describe InstallCmd do
   include FakeFS::SpecHelpers
 
   describe "#insert_into_modsettings" do
+    let(:install_cmd) { InstallCmd.new }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:config_helper) { ConfigHelper.new }
+
     context "when there aren't existing mods" do
+      let(:info_json_helper) do
+        instance_double(InfoJsonHelper,
+                        folder: "Test Folder",
+                        md5: "54c3136171518f973ad518b43f3f35ae",
+                        name: "Test Mod",
+                        uuid: "658ba936-8a5c-40f1-94a6-7bf8d874b66e",
+                        version: "")
+      end
+
       before do
         File.write("modsettings.lsx",
                    <<-EXAMPLE
@@ -38,26 +54,11 @@ RSpec.describe "install.rb" do
 EXAMPLE
         )
 
-        allow(self).to receive(:puts)
-        allow(self).to receive(:get_toml_config).and_return({})
-        allow(self).to receive(:modsettings_dir).and_return(".")
+        allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
+        allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
+        allow(modsettings_helper).to receive(:puts)
 
-        insert_into_modsettings({
-          "Mods" => [
-            {
-              "Author" => "Poopie",
-              "Name" => "Test Mod",
-              "Folder" => "Test Folder",
-              "Version" => "",
-              "Description" => "Example description",
-              "UUID" => "658ba936-8a5c-40f1-94a6-7bf8d874b66e",
-              "Created" => "2024-01-01T03:00:00.1238948+09:00",
-              "Dependencies" => [],
-              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
-            }
-          ],
-          "MD5" => "54c3136171518f973ad518b43f3f35ae"
-        })
+        install_cmd.insert_into_modsettings(info_json_helper)
       end
 
       it "adds the mod to modsettings.lsx" do

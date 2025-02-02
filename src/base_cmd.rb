@@ -6,8 +6,6 @@ require_relative "helpers/modsettings_helper"
 
 class BaseCmd
   def initialize
-    self.check_requirements!
-
     @config_helper = ConfigHelper.new
     @mod_data_helper = ModDataHelper.new
     @modsettings_helper = ModsettingsHelper.new(@config_helper)

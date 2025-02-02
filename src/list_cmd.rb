@@ -10,6 +10,8 @@ class ListCmd < BaseCmd
   }
 
   def run
+    self.check_requirements!
+
     if @mod_data_helper.data.keys.size == 0
       puts "No mods installed yet."
       return

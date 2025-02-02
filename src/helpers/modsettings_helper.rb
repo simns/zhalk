@@ -7,10 +7,10 @@ class ModsettingsHelper < BaseHelper
     end
 
     @config_helper = config_helper
-    @filepath = File.join(self.modsettings_dir, "modsettings.lsx")
   end
 
   def data
+    @filepath = File.join(self.modsettings_dir, "modsettings.lsx")
     @data ||= self.get_modsettings
 
     return @data
@@ -35,6 +35,6 @@ class ModsettingsHelper < BaseHelper
   private
 
   def get_modsettings
-    get_xml_data(@filepath)
+    self.get_xml_data(@filepath)
   end
 end
