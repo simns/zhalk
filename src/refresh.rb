@@ -24,6 +24,7 @@ def refresh_cmd
       mod_data[uuid] = {
         "is_installed" => true,
         "mod_name" => name,
+        "type" => "from_modsettings",
         "uuid" => uuid,
         "number" => starting_number + num_added,
         "created_at" => Time.now.to_s,

@@ -1,5 +1,6 @@
 require "pp"
 require "fakefs/spec_helpers"
+require "json"
 
 require_relative "../src/common"
 
@@ -79,7 +80,9 @@ RSpec.describe "common.rb" do
       end
 
       it "saves the json" do
-        expect(File.read("data.json")).to eq(%q[{"bar":"dat"}])
+        expect(JSON.parse(File.read("data.json"))).to eq({
+          "bar" => "dat"
+        })
       end
     end
   end

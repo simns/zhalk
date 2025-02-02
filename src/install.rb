@@ -138,6 +138,7 @@ def update_mod_data(mod_data, info_json)
     mod_data[uuid] = {
       "is_installed" => true,
       "mod_name" => name,
+      "type" => "standard",
       "uuid" => uuid,
       "number" => new_number,
       "created_at" => Time.now.to_s,
