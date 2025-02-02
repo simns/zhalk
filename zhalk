@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-# require_relative "src/init"
-# require_relative "src/install"
+require_relative "src/init_cmd"
+require_relative "src/install_cmd"
 require_relative "src/list_cmd"
 # require_relative "src/refresh"
 # require_relative "src/reorder"
@@ -10,9 +10,9 @@ command = ARGV[0]
 
 case command
 when "init"
-  # init_cmd
+  InitCmd.new.run
 when "install"
-  # install_cmd
+  InstallCmd.new.run
 when "list"
   ListCmd.new.run
 when "refresh"
