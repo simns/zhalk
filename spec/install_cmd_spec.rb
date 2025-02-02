@@ -16,6 +16,12 @@ RSpec.describe InstallCmd do
     let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
     let(:config_helper) { ConfigHelper.new }
 
+    before do
+      allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
+      allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
+      allow(modsettings_helper).to receive(:puts)
+    end
+
     context "when there aren't existing mods" do
       let(:info_json_helper) do
         instance_double(InfoJsonHelper,
@@ -53,10 +59,6 @@ RSpec.describe InstallCmd do
 </save>
 EXAMPLE
         )
-
-        allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
-        allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
-        allow(modsettings_helper).to receive(:puts)
 
         install_cmd.insert_into_modsettings(info_json_helper)
       end
@@ -99,6 +101,15 @@ NEWFILE
     end
 
     context "when the target mod is already present" do
+      let(:info_json_helper) do
+        instance_double(InfoJsonHelper,
+                        folder: "Test Folder",
+                        md5: "54c3136171518f973ad518b43f3f35ae",
+                        name: "Test Mod",
+                        uuid: "cf5175fb-0a7c-4af3-b51c-14b683a5cb7d",
+                        version: "")
+      end
+
       before do
         File.write("modsettings.lsx",
                    <<-EXAMPLE
@@ -133,49 +144,16 @@ NEWFILE
 </save>
 EXAMPLE
         )
-
-        allow(self).to receive(:get_toml_config).and_return({})
-        allow(self).to receive(:modsettings_dir).and_return(".")
       end
 
       it "warns that the entry already exists" do
         expect {
-          insert_into_modsettings({
-            "Mods" => [
-              {
-                "Author" => "Poopie",
-                "Name" => "Test Mod",
-                "Folder" => "Test Folder",
-                "Version" => "",
-                "Description" => "Example description",
-                "UUID" => "cf5175fb-0a7c-4af3-b51c-14b683a5cb7d",
-                "Created" => "2024-01-01T03:00:00.1238948+09:00",
-                "Dependencies" => [],
-                "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
-              }
-            ],
-            "MD5" => "54c3136171518f973ad518b43f3f35ae"
-          })
+          install_cmd.insert_into_modsettings(info_json_helper)
         }.to output("WARN: Mod entry already exists in modsettings.lsx.\n").to_stdout
       end
 
       it "doesn't modify anything" do
-        insert_into_modsettings({
-          "Mods" => [
-            {
-              "Author" => "Poopie",
-              "Name" => "Test Mod",
-              "Folder" => "Test Folder",
-              "Version" => "",
-              "Description" => "Example description",
-              "UUID" => "cf5175fb-0a7c-4af3-b51c-14b683a5cb7d",
-              "Created" => "2024-01-01T03:00:00.1238948+09:00",
-              "Dependencies" => [],
-              "Group" => "82e1e744-3ea9-4cdd-9d4a-1bb46a8bb2c7"
-            }
-          ],
-          "MD5" => "54c3136171518f973ad518b43f3f35ae"
-        })
+        install_cmd.insert_into_modsettings(info_json_helper)
 
         expect(File.read("modsettings.lsx")).to eq(
                                                   <<-EXAMPLE
