@@ -1,24 +1,24 @@
 #!/usr/bin/env ruby
 
-require_relative "src/init"
-require_relative "src/install"
-require_relative "src/list"
-require_relative "src/refresh"
-require_relative "src/reorder"
+# require_relative "src/init"
+# require_relative "src/install"
+require_relative "src/list_cmd"
+# require_relative "src/refresh"
+# require_relative "src/reorder"
 
 command = ARGV[0]
 
 case command
 when "init"
-  init_cmd
+  # init_cmd
 when "install"
-  install_cmd
+  # install_cmd
 when "list"
-  list_cmd
+  ListCmd.new.run
 when "refresh"
-  refresh_cmd
+  # refresh_cmd
 when "reorder"
-  reorder_cmd
+  # reorder_cmd
 else
   puts "Unknown command #{command}"
 end
