@@ -1,19 +1,31 @@
 require "pp"
 require "fakefs/spec_helpers"
 require "json"
+require "date"
 
-require_relative "../src/reorder"
+require_relative "../src/reorder_cmd"
+require_relative "../src/helpers/modsettings_helper"
+require_relative "../src/helpers/mod_data_helper"
+require_relative "../src/helpers/config_helper"
 
-RSpec.describe "reorder.rb" do
+RSpec.describe ReorderCmd do
   include FakeFS::SpecHelpers
 
   describe "#reorder_cmd" do
+    let(:reorder_cmd) { ReorderCmd.new }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:config_helper) { ConfigHelper.new }
+    let(:mod_data_helper) { ModDataHelper.new }
+
     before do
       FileUtils.touch("conf.toml")
 
-      allow(self).to receive(:puts)
-      allow(self).to receive(:get_toml_config).and_return({})
-      allow(self).to receive(:modsettings_dir).and_return(".")
+      allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
+      allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
+      allow(modsettings_helper).to receive(:puts)
+      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
+      allow(mod_data_helper).to receive(:puts)
+      allow(reorder_cmd).to receive(:puts)
     end
 
     context "when mod-data.json is empty" do
@@ -51,7 +63,7 @@ MODSETTINGS
 
           allow(STDIN).to receive(:gets).and_return("1")
 
-          reorder_cmd
+          reorder_cmd.run
         end
 
         it "stops because no mods were found" do
@@ -138,7 +150,7 @@ MODSETTINGS
 
           allow(STDIN).to receive(:gets).and_return("1", "e")
 
-          reorder_cmd
+          reorder_cmd.run
         end
 
         it "modifies mod-data.json to reflect new order" do
@@ -236,7 +248,7 @@ MODSETTINGS
 
             allow(STDIN).to receive(:gets).and_return("1", "e")
 
-            reorder_cmd
+            reorder_cmd.run
           end
 
           it "modifies mod-data.json to reflect new order" do
@@ -351,11 +363,12 @@ MODSETTINGS
           end
 
           it "stops before writing any data to the files" do
-            expect(self).to_not receive(:put_after_mod)
-            expect(self).to_not receive(:write_new_mod_data)
-            expect(self).to_not receive(:write_new_modsettings)
+            expect(reorder_cmd).to receive(:process_command)
+            expect(reorder_cmd).to_not receive(:put_after_mod)
+            expect(reorder_cmd).to_not receive(:write_new_mod_data)
+            expect(reorder_cmd).to_not receive(:write_new_modsettings)
 
-            reorder_cmd
+            reorder_cmd.run
           end
         end
       end
@@ -431,7 +444,7 @@ MODSETTINGS
 
           allow(STDIN).to receive(:gets).and_return("1", "e")
 
-          reorder_cmd
+          reorder_cmd.run
         end
 
         it "reorders mod-data.json as usual" do
