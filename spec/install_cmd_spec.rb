@@ -264,7 +264,12 @@ EXAMPLE
     end
   end
 
-  describe "#install_cmd" do
+  describe "#run" do
+    let(:install_cmd) { InstallCmd.new }
+    let(:mod_data_helper) { ModDataHelper.new }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:config_helper) { ConfigHelper.new }
+
     before do
       File.write("mod-data.json", "{}")
       File.write("conf.toml",
@@ -305,12 +310,17 @@ MODSETTINGS
       FileUtils.mkdir("mods")
       FileUtils.mkdir("dump")
 
-      allow(self).to receive(:puts)
+      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
+      allow(mod_data_helper).to receive(:puts)
+      allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
+      allow(modsettings_helper).to receive(:puts)
+
+      allow(install_cmd).to receive(:puts)
     end
 
     context "when all necessary files exist" do
       it "creates a backup of modsettings" do
-        install_cmd
+        install_cmd.run
 
         expect(File.exist?(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx.bak"))).to be(true)
       end
@@ -319,7 +329,7 @@ MODSETTINGS
         before do
           FileUtils.touch(File.join("mods", "mod1.zip"))
 
-          allow(self).to receive(:extract_mod_files) do
+          allow(install_cmd).to receive(:extract_mod_files) do
             FileUtils.mkdir_p(File.join("dump", "mod1"))
             FileUtils.touch(File.join("dump", "mod1", "mod1.pak"))
             File.write(File.join("dump", "mod1", "info.json"), {
@@ -340,7 +350,7 @@ MODSETTINGS
             }.to_json)
           end
 
-          install_cmd
+          install_cmd.run
         end
 
         it "updates modsettings.lsx" do
