@@ -1,10 +1,13 @@
 require "pp"
 require "fakefs/spec_helpers"
 require "json"
+require "date"
 
-require_relative "../src/refresh"
+require_relative "../src/refresh_cmd"
+require_relative "../src/helpers/modsettings_helper"
+require_relative "../src/helpers/config_helper"
 
-RSpec.describe "refresh.rb" do
+RSpec.describe RefreshCmd do
   include FakeFS::SpecHelpers
 
   before do
@@ -12,7 +15,18 @@ RSpec.describe "refresh.rb" do
     File.write("conf.toml", "")
   end
 
-  describe "#refresh_cmd" do
+  describe "#run" do
+    let(:refresh_cmd) { RefreshCmd.new }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:config_helper) { ConfigHelper.new }
+
+    before do
+      allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
+      allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
+      allow(modsettings_helper).to receive(:puts)
+      allow(refresh_cmd).to receive(:puts)
+    end
+
     context "when there is nothing in the modsettings" do
       before do
         File.write("mod-data.json", "{}")
@@ -35,11 +49,7 @@ RSpec.describe "refresh.rb" do
 MODSETTINGS
         )
 
-        allow(self).to receive(:puts)
-        allow(self).to receive(:get_toml_config).and_return({})
-        allow(self).to receive(:modsettings_dir).and_return(".")
-
-        refresh_cmd
+        refresh_cmd.run
       end
 
       it "doesn't add anything to mod-data.json" do
@@ -50,14 +60,10 @@ MODSETTINGS
     context "when there is no modsettings file" do
       before do
         File.write("mod-data.json", "{}")
-
-        allow(self).to receive(:puts)
-        allow(self).to receive(:get_toml_config).and_return({})
-        allow(self).to receive(:modsettings_dir).and_return(".")
       end
 
       it "raises an error that the file doesn't exist" do
-        expect { refresh_cmd }.to raise_error(Errno::ENOENT)
+        expect { refresh_cmd.run }.to raise_error(Errno::ENOENT)
       end
     end
 
@@ -91,11 +97,7 @@ MODSETTINGS
 MODSETTINGS
         )
 
-        allow(self).to receive(:puts)
-        allow(self).to receive(:get_toml_config).and_return({})
-        allow(self).to receive(:modsettings_dir).and_return(".")
-
-        refresh_cmd
+        refresh_cmd.run
       end
 
       it "reads the mod into mod-data.json" do
@@ -151,11 +153,7 @@ MODSETTINGS
 MODSETTINGS
         )
 
-        allow(self).to receive(:puts)
-        allow(self).to receive(:get_toml_config).and_return({})
-        allow(self).to receive(:modsettings_dir).and_return(".")
-
-        refresh_cmd
+        refresh_cmd.run
       end
 
       it "skips the mod that is already installed" do

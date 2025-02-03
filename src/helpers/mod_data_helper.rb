@@ -35,6 +35,18 @@ class ModDataHelper < BaseHelper
     }
   end
 
+  def add_modsettings_entry(uuid, name, number)
+    self.data[uuid] = {
+      "is_installed" => true,
+      "mod_name" => name,
+      "type" => "from_modsettings",
+      "uuid" => uuid,
+      "number" => number,
+      "created_at" => Time.now.to_s,
+      "updated_at" => Time.now.to_s
+    }
+  end
+
   def save(with_logging: false)
     return if self.data.nil?
 

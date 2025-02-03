@@ -3,7 +3,7 @@
 require_relative "src/init_cmd"
 require_relative "src/install_cmd"
 require_relative "src/list_cmd"
-# require_relative "src/refresh"
+require_relative "src/refresh_cmd"
 # require_relative "src/reorder"
 
 command = ARGV[0]
@@ -16,7 +16,7 @@ when "install"
 when "list"
   ListCmd.new.run
 when "refresh"
-  # refresh_cmd
+  RefreshCmd.new.run
 when "reorder"
   # reorder_cmd
 else
