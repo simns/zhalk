@@ -11,7 +11,19 @@ class BaseCmd
     @modsettings_helper = ModsettingsHelper.new(@config_helper)
   end
 
-  def run
+  def run(*args)
+    if args[0] == "--help"
+      puts self.help
+    else
+      self.main(args)
+    end
+  end
+
+  def main(args)
+    raise NoMethodError
+  end
+
+  def help
     raise NoMethodError
   end
 

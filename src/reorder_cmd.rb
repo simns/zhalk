@@ -3,7 +3,24 @@ require_relative "list_cmd"
 require_relative "helpers/constants"
 
 class ReorderCmd < BaseCmd
-  def run
+  def help
+    <<-HELP
+Usage:
+  zhalk reorder
+
+Description:
+  This allows mods to be reordered so that dependencies of a mod can be set to load beforehand.
+  Running the command will show the same table used in the 'list' command. From there, note \
+the numbers of the mods you want to move. Input them as a comma-separated list. Then, choose \
+a command in the next prompt, such as placing them at the beginning, end, or after a particular \
+mod.
+
+Options:
+  This command does not have any options.
+HELP
+  end
+
+  def main(args)
     self.check_requirements!
 
     table = ListCmd.new.construct_mod_table

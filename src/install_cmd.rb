@@ -6,7 +6,24 @@ require_relative "helpers/info_json_helper"
 require_relative "helpers/constants"
 
 class InstallCmd < BaseCmd
-  def run
+  def help
+    <<-HELP
+Usage:
+  zhalk install [options]
+
+Description:
+  This installs mods that are located in the mods/ directory. Each mod must be a .zip file. Mods \
+that are already installed will be skipped.
+
+Options:
+  --dry-run     Don't install anything. Only list what would be installed.
+
+Aliases:
+  in, i
+HELP
+  end
+
+  def main(args)
     self.check_requirements!
 
     self.make_modsettings_backup

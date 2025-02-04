@@ -9,7 +9,24 @@ class ListCmd < BaseCmd
     "from_modsettings" => "From modsettings"
   }
 
-  def run
+  def help
+    <<-HELP
+Usage:
+  zhalk list [options]
+
+Description:
+  This lists mods in a table. By default, the table shows active and inactive mods.
+
+Options:
+  --active      Show only active mods
+  --inactive    Show only inactive mods
+
+Aliases:
+  ls, l
+HELP
+  end
+
+  def main(args)
     self.check_requirements!
 
     if @mod_data_helper.data.keys.size == 0
