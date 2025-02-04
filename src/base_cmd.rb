@@ -66,6 +66,10 @@ class BaseCmd
     num == 1 ? "1 #{type} mod" : "#{num} #{type} mods"
   end
 
+  def num?(num)
+    return num.to_i.to_s == num.strip
+  end
+
   private
 
   def check_requirements!

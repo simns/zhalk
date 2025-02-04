@@ -155,8 +155,4 @@ HELP
   def valid_mod_nums?(mod_numbers)
     return mod_numbers =~ /\A\d+\s*(,\s*\d+\s*)*\z/
   end
-
-  def num?(num)
-    return num.to_i.to_s == num.strip
-  end
 end

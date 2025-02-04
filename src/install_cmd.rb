@@ -99,7 +99,7 @@ HELP
   def insert_into_modsettings(info_json_helper)
     modsettings = @modsettings_helper.data
 
-    if modsettings.at("attribute#UUID[value='#{info_json_helper.uuid}']")
+    if modsettings.at_css("attribute#UUID[value='#{info_json_helper.uuid}']")
       puts "WARN: Mod entry already exists in modsettings.lsx."
       return
     end
