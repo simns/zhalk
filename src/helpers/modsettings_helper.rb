@@ -10,15 +10,19 @@ class ModsettingsHelper < BaseHelper
   end
 
   def data
-    @filepath = File.join(self.modsettings_dir, "modsettings.lsx")
+    @filepath ||= File.join(self.modsettings_dir, "modsettings.lsx")
     @data ||= self.get_modsettings
 
     return @data
   end
 
-  def save(doc, with_logging: false)
+  def save(doc = nil, with_logging: false)
     File.open(@filepath, "w") do |f|
-      f.write(doc.to_xml)
+      if doc
+        f.write(doc.to_xml)
+      else
+        f.write(self.data)
+      end
     end
 
     if with_logging

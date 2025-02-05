@@ -7,8 +7,8 @@ Usage:
   zhalk deactivate [MOD_NUMBER]
 
 Description:
-  This sets a mod as inactive, which removes it from the game's modsettings.lsx file. This will \
-not delete the mod files. Specify the mod with the associated mod number. You can see this \
+  This sets a mod as inactive, which removes its entry from the game's modsettings.lsx file. This will \
+not delete the mod files. Specify the mod with the associated mod number. You can see the numbers \
 with the 'list' command.
   Mod can be easily reactivated with the 'activate' command.
 
@@ -38,12 +38,31 @@ HELP
 
     target_uuid = target_mod["uuid"]
 
+    self.create_xml_backup(target_uuid)
+
+    self.remove_from_modsettings(target_uuid)
+
+    self.update_mod_data(target_uuid)
+
+    puts "Done."
+  end
+
+  def create_xml_backup(target_uuid)
     File.write(
       File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"),
       @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']").parent.to_xml
     )
+  end
 
-    puts
-    puts "Done."
+  def remove_from_modsettings(target_uuid)
+    @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']").parent.remove
+
+    @modsettings_helper.save
+  end
+
+  def update_mod_data(target_uuid)
+    @mod_data_helper.set_installed(target_uuid, false)
+
+    @mod_data_helper.save
   end
 end

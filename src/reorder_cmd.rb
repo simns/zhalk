@@ -149,7 +149,7 @@ HELP
 
     parent_node.children = Nokogiri::XML::NodeSet.new(modsettings, mod_entries)
 
-    @modsettings_helper.save(modsettings, with_logging: true)
+    @modsettings_helper.save(with_logging: true)
   end
 
   def valid_mod_nums?(mod_numbers)

@@ -13,8 +13,8 @@ class ModDataHelper < BaseHelper
     return self.data.has_key?(uuid)
   end
 
-  def set_installed(uuid)
-    self.data[uuid]["is_installed"] = true
+  def set_installed(uuid, is_installed = true)
+    self.data[uuid]["is_installed"] = is_installed
   end
 
   def add_standard_entry(uuid, name)
