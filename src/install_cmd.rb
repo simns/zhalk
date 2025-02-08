@@ -154,13 +154,15 @@ HELP
   end
 
   def print_install_report(installed_mods)
+    puts
+
     if installed_mods.size == 0
-      puts "\nNothing to do."
+      puts "Nothing to do."
     else
       standard_mods = installed_mods.select { |mod| mod[:type] == :standard }
       pak_only_mods = installed_mods.select { |mod| mod[:type] == :pak_only }
 
-      puts "\n===== INSTALL REPORT ====="
+      puts "===== INSTALL REPORT ====="
       puts "You installed #{self.num_mods(standard_mods.size, "standard")}."
       puts standard_mods.map { |mod| "-> #{mod[:name]}" }
       if standard_mods.size >= 1
