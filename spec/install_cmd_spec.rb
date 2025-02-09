@@ -242,7 +242,9 @@ EXAMPLE
             "is_installed" => false,
             "mod_name" => "Test Mod",
             "uuid" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
-            "number" => 1
+            "number" => 1,
+            "created_at" => Time.now.to_s,
+            "updated_at" => Time.now.to_s
           }
         }.to_json)
 
