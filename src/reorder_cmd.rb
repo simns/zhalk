@@ -137,7 +137,7 @@ HELP
   def write_new_modsettings
     modsettings = @modsettings_helper.data
 
-    parent_node = modsettings.at("node#Mods children")
+    parent_node = modsettings.at_css("node#Mods children")
 
     mod_entries = parent_node.css("node").sort_by do |node|
       uuid = node.at("attribute#UUID")["value"]

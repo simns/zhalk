@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 
 require_relative "src/init_cmd"
+require_relative "src/help_cmd"
 require_relative "src/install_cmd"
 require_relative "src/list_cmd"
 require_relative "src/refresh_cmd"
 require_relative "src/reorder_cmd"
 require_relative "src/update_cmd"
 require_relative "src/deactivate_cmd"
-require_relative "src/help_cmd"
+require_relative "src/activate_cmd"
 
 command = ARGV[0]
 options = ARGV[1..-1]
@@ -27,6 +28,8 @@ when "update"
   UpdateCmd.new.run(*options)
 when "deactivate"
   DeactivateCmd.new.run(*options)
+when "activate"
+  ActivateCmd.new.run(*options)
 when "--help", "help"
   HelpCmd.new.run
 else
