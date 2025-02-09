@@ -1,4 +1,5 @@
 require_relative "base_cmd"
+require_relative "helpers/constants"
 
 class DeactivateCmd < BaseCmd
   def help
@@ -31,6 +32,9 @@ HELP
     if target_mod.nil?
       puts "Could not find a mod with number: #{target_mod_number}."
       return
+    elsif !target_mod["is_installed"]
+      puts "Target mod is already deactivated."
+      return
     end
 
     puts "Deactivating mod:"
@@ -48,9 +52,16 @@ HELP
   end
 
   def create_xml_backup(target_uuid)
+    uuid_attribute = @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']")
+    if uuid_attribute.nil?
+      raise "Could not find mod entry in modsettings.lsx. Cannot proceed."
+    end
+
+    mod_entry = uuid_attribute.parent
+
     File.write(
       File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"),
-      @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']").parent.to_xml
+      mod_entry.to_xml
     )
   end
 
