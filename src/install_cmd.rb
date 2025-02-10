@@ -46,9 +46,15 @@ HELP
         info_json_helper.load_data
         info_json_helper.check_fields!
 
-        if @mod_data_helper.data.dig(info_json_helper.uuid, "is_installed")
-          puts "Mod is marked as installed. Skipping."
-          next
+        mod_data_entry = @mod_data_helper.data[info_json_helper.uuid]
+        if mod_data_entry
+          if mod_data_entry["is_installed"]
+            puts "Mod is marked as installed. Skipping."
+            next
+          else
+            puts "Mod is marked as inactive. Skipping."
+            next
+          end
         end
 
         self.insert_into_modsettings(info_json_helper)

@@ -2,6 +2,7 @@ require "pp"
 require "fakefs/spec_helpers"
 require "nokogiri"
 require "json"
+require "date"
 
 require_relative "../src/install_cmd"
 require_relative "../src/helpers/modsettings_helper"
@@ -35,7 +36,7 @@ RSpec.describe InstallCmd do
 
       before do
         File.write("modsettings.lsx",
-                   <<-EXAMPLE
+                   <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -58,7 +59,7 @@ RSpec.describe InstallCmd do
     </node>
   </region>
 </save>
-EXAMPLE
+XML
         )
 
         install_cmd.insert_into_modsettings(info_json_helper)
@@ -66,7 +67,7 @@ EXAMPLE
 
       it "adds the mod to modsettings.lsx" do
         expect(File.read("modsettings.lsx")).to eq(
-                                                  <<-NEWFILE
+                                                  <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -96,7 +97,7 @@ EXAMPLE
     </node>
   </region>
 </save>
-NEWFILE
+XML
                                                 )
       end
     end
@@ -284,7 +285,7 @@ CONF
       FileUtils.mkdir_p(File.join("appdata", "PlayerProfiles", "Public"))
       FileUtils.mkdir_p(File.join("appdata", "Mods"))
       File.write(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx"),
-                 <<-MODSETTINGS
+                 <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -307,7 +308,7 @@ CONF
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
       )
       FileUtils.mkdir("mods")
       FileUtils.mkdir("dump")
@@ -356,8 +357,10 @@ MODSETTINGS
         end
 
         it "updates modsettings.lsx" do
-          expect(File.read(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx"))).to eq(
-                                                                                                      <<-MODSETTINGS
+          expect(
+            File.read(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx"))
+          ).to eq(
+                 <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -387,8 +390,8 @@ MODSETTINGS
     </node>
   </region>
 </save>
-       MODSETTINGS
-                                                                                                    )
+XML
+               )
         end
 
         it "updates mod-data.json" do
@@ -406,6 +409,92 @@ MODSETTINGS
 
         it "moves the pak files" do
           expect(File.exist?(File.join("appdata", "Mods", "mod1.pak"))).to be(true)
+        end
+      end
+
+      context "when the mod is already set as installed" do
+        before do
+          FileUtils.touch(File.join("mods", "mod1.zip"))
+          FileUtils.mkdir(File.join("dump", "mod1"))
+          FileUtils.touch(File.join("dump", "mod1", "mod1.pak"))
+          File.write(File.join("dump", "mod1", "info.json"), {
+            "Mods": [
+              {
+                "Author": "Poopie",
+                "Name": "Mod 1",
+                "Folder": "Mod 1",
+                "Version": "",
+                "Description": "Mod 1 description",
+                "UUID": "a3455a30-0225-4a5e-9bab-90899aba9fab",
+                "Created": "2024-01-01T03:00:00.1238948+09:00",
+                "Dependencies": [],
+                "Group": "6f19e75b-fb4d-47a5-ae60-1a54726f44ba"
+              }
+            ],
+            "MD5": "ee8a3210df51af3cea80ed82d2d99118"
+          }.to_json)
+
+          File.write("mod-data.json", {
+            "a3455a30-0225-4a5e-9bab-90899aba9fab" => {
+              "is_installed" => true,
+              "mod_name" => "Mod 1",
+              "uuid" => "a3455a30-0225-4a5e-9bab-90899aba9fab",
+              "number" => 1,
+              "created_at" => Time.now.to_s,
+              "updated_at" => Time.now.to_s
+            }
+          }.to_json)
+        end
+
+        it "skips the installation" do
+          expect(install_cmd).to receive(:extract_mod_files)
+          expect(install_cmd).to_not receive(:insert_into_modsettings)
+          expect(install_cmd).to_not receive(:update_mod_data)
+
+          install_cmd.run
+        end
+      end
+
+      context "when the mod is set as inactive" do
+        before do
+          FileUtils.touch(File.join("mods", "mod1.zip"))
+          FileUtils.mkdir(File.join("dump", "mod1"))
+          FileUtils.touch(File.join("dump", "mod1", "mod1.pak"))
+          File.write(File.join("dump", "mod1", "info.json"), {
+            "Mods": [
+              {
+                "Author": "Poopie",
+                "Name": "Mod 1",
+                "Folder": "Mod 1",
+                "Version": "",
+                "Description": "Mod 1 description",
+                "UUID": "cc45e136-ae1e-4118-83f8-6e11a04beee3",
+                "Created": "2024-01-01T03:00:00.1238948+09:00",
+                "Dependencies": [],
+                "Group": "6f19e75b-fb4d-47a5-ae60-1a54726f44ba"
+              }
+            ],
+            "MD5": "ee8a3210df51af3cea80ed82d2d99118"
+          }.to_json)
+
+          File.write("mod-data.json", {
+            "cc45e136-ae1e-4118-83f8-6e11a04beee3" => {
+              "is_installed" => false,
+              "mod_name" => "Mod 1",
+              "uuid" => "cc45e136-ae1e-4118-83f8-6e11a04beee3",
+              "number" => 1,
+              "created_at" => Time.now.to_s,
+              "updated_at" => Time.now.to_s
+            }
+          }.to_json)
+        end
+
+        it "skips the installation" do
+          expect(install_cmd).to receive(:extract_mod_files)
+          expect(install_cmd).to_not receive(:insert_into_modsettings)
+          expect(install_cmd).to_not receive(:update_mod_data)
+
+          install_cmd.run
         end
       end
     end
