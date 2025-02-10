@@ -17,22 +17,34 @@ that are already installed will be skipped.
 
 Options:
   --dry-run     Don't install anything. Only list what would be installed.
+  --update      Update all mods by reprocessing zip files in 'mods' folder. Same as 'update' command.
 
 Aliases:
   in, i
 HELP
   end
 
+  def process_args(args)
+    @is_update = args.include?("--update")
+
+    if @is_update
+      puts "Running an update. All mods inside the 'mods' folder will be re-processed."
+      puts
+    end
+  end
+
   def main(args)
     self.check_requirements!
+
+    self.process_args(args)
 
     self.make_modsettings_backup
 
     installed_mods = []
 
     Dir.glob(File.join(Constants::MODS_DIR, "*.zip")).each do |zip_file_name|
-      puts "==== Processing #{zip_file_name} ===="
       mod_name = /#{Constants::MODS_DIR}\/([\w\s\-\._'"]+)\.zip/.match(zip_file_name)[1]
+      puts "==== Processing #{mod_name} ===="
 
       if mod_name.nil?
         raise "Couldn't get mod name from zip file. Perhaps there are some unrecognized characters."
@@ -47,7 +59,7 @@ HELP
         info_json_helper.check_fields!
 
         mod_data_entry = @mod_data_helper.data[info_json_helper.uuid]
-        if mod_data_entry
+        if mod_data_entry && !@is_update
           if mod_data_entry["is_installed"]
             puts "Mod is marked as installed. Skipping."
             next
@@ -57,9 +69,11 @@ HELP
           end
         end
 
-        self.insert_into_modsettings(info_json_helper)
+        if !@is_update
+          self.insert_into_modsettings(info_json_helper)
 
-        self.update_mod_data(info_json_helper)
+          self.update_mod_data(info_json_helper)
+        end
 
         self.copy_pak_files(mod_name)
 
@@ -83,7 +97,7 @@ HELP
   end
 
   def extract_mod_files(zip_file_name, mod_name)
-    if File.exist?(File.join(Constants::DUMP_DIR, mod_name))
+    if File.exist?(File.join(Constants::DUMP_DIR, mod_name)) && !@is_update
       puts "Zip file already extracted. Skipping."
       return
     end
@@ -149,11 +163,21 @@ HELP
   def copy_pak_files(mod_name)
     did_copy = false
     Dir.glob(File.join(Constants::DUMP_DIR, mod_name, "*.pak")).each do |pak_file|
-      did_copy ||= self.safe_cp(
-        pak_file,
-        File.join(@config_helper.data["paths"]["appdata_dir"], "Mods"),
-        with_logging: true
-      )
+      if @is_update
+        FileUtils.cp(
+          pak_file,
+          File.join(@config_helper.data["paths"]["appdata_dir"], "Mods")
+        )
+        puts "Copied file #{File.basename(pak_file)}."
+
+        did_copy = true
+      else
+        did_copy ||= self.safe_cp(
+          pak_file,
+          File.join(@config_helper.data["paths"]["appdata_dir"], "Mods"),
+          with_logging: true
+        )
+      end
     end
 
     return did_copy
