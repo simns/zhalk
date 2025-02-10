@@ -51,18 +51,23 @@ HELP
 
     self.load_inactive_into_modsettings(target_uuid)
 
-    self.delete_inactive_backup(target_uuid)
-
     self.update_mod_data(target_uuid)
+
+    self.delete_inactive_backup(target_uuid)
 
     puts "Done."
   end
 
   def load_inactive_into_modsettings(target_uuid)
-    inactive_entry = @base_helper.get_xml_data(File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"))
+    inactive_mod_doc = @base_helper.get_xml_data(File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"))
+    inactive_entry = inactive_mod_doc.at_css("node#ModuleShortDesc")
+
+    if inactive_entry.nil?
+      raise "Could not find inactive mod entry in the backup file."
+    end
 
     mods = @modsettings_helper.data.css("node#Mods node")
-    mods << inactive_entry.at_css("node#ModuleShortDesc")
+    mods << inactive_entry
 
     mods = mods.sort_by do |node|
       uuid = node.at("attribute#UUID")["value"]
@@ -88,5 +93,6 @@ HELP
 
   def delete_inactive_backup(target_uuid)
     # TODO: Implement
+    puts "Backup file will not be deleted for now. Feel free to delete it manually."
   end
 end
