@@ -68,12 +68,12 @@ HELP
   def remove_from_modsettings(target_uuid)
     @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']").parent.remove
 
-    @modsettings_helper.save
+    @modsettings_helper.save(with_logging: true)
   end
 
   def update_mod_data(target_uuid)
     @mod_data_helper.set_installed(target_uuid, false)
 
-    @mod_data_helper.save
+    @mod_data_helper.save(with_logging: true)
   end
 end

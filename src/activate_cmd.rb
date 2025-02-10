@@ -59,7 +59,12 @@ HELP
   end
 
   def load_inactive_into_modsettings(target_uuid)
-    inactive_mod_doc = @base_helper.get_xml_data(File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"))
+    inactive_mod_filepath = File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml")
+    if !File.exist?(inactive_mod_filepath)
+      raise "Could not find inactive mod's backup xml file."
+    end
+
+    inactive_mod_doc = @base_helper.get_xml_data(inactive_mod_filepath)
     inactive_entry = inactive_mod_doc.at_css("node#ModuleShortDesc")
 
     if inactive_entry.nil?
