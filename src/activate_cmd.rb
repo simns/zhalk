@@ -22,6 +22,9 @@ Specify the mod with the associated mod number. You can see the numbers with the
 
 Options:
   This command does not have any options.
+
+Aliases:
+  enable
 HELP
   end
 

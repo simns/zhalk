@@ -15,6 +15,9 @@ with the 'list' command.
 
 Options:
   This command does not have any options.
+
+Aliases:
+  disable
 HELP
   end
 

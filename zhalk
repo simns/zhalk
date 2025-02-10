@@ -26,9 +26,9 @@ when "reorder"
   ReorderCmd.new.run(*options)
 when "update"
   UpdateCmd.new.run(*options)
-when "deactivate"
+when "deactivate", "disable"
   DeactivateCmd.new.run(*options)
-when "activate"
+when "activate", "enable"
   ActivateCmd.new.run(*options)
 when "--help", "help"
   HelpCmd.new.run
