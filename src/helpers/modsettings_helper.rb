@@ -33,7 +33,7 @@ class ModsettingsHelper < BaseHelper
   def modsettings_dir
     config = @config_helper.data
 
-    File.join(config["paths"]["appdata_dir"], "PlayerProfiles", "Public")
+    return File.join(config["paths"]["appdata_dir"], "PlayerProfiles", "Public")
   end
 
   private

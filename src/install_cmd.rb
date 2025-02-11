@@ -79,7 +79,8 @@ HELP
 
         installed_mods << {
           name: mod_name,
-          type: :standard
+          type: :standard,
+          is_inactive: @is_update && !@mod_data_helper.installed?(info_json_helper.uuid)
         }
       else
         did_copy = self.copy_pak_files(mod_name)
@@ -201,16 +202,18 @@ HELP
       standard_mods = installed_mods.select { |mod| mod[:type] == :standard }
       pak_only_mods = installed_mods.select { |mod| mod[:type] == :pak_only }
 
+      action_text = @is_update ? "updated files for" : "installed"
+
       puts "===== INSTALL REPORT ====="
-      puts "You installed #{self.num_mods(standard_mods.size, "standard")}."
-      puts standard_mods.map { |mod| "-> #{mod[:name]}" }
-      if standard_mods.size >= 1
+      puts "You #{action_text} #{self.num_mods(standard_mods.size, "standard")}."
+      puts standard_mods.map { |mod| "-> #{mod[:name]} #{mod[:is_inactive] ? "(inactive)" : ""}" }
+      if !@is_update && standard_mods.size >= 1
         puts "Nothing left to do for these."
       end
       puts ""
-      puts "You installed #{self.num_mods(pak_only_mods.size, "pak-only")}."
+      puts "You #{action_text} #{self.num_mods(pak_only_mods.size, "pak-only")}."
       puts pak_only_mods.map { |mod| "-> #{mod[:name]}" }
-      if pak_only_mods.size >= 1
+      if !@is_update && pak_only_mods.size >= 1
         puts "These mods need to be activated in the in-game mod manager."
       end
     end

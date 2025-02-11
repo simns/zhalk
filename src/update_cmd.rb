@@ -10,7 +10,8 @@ Usage:
 Description:
   This command updates all the mods in the 'mods' directory. It will re-extract all the .zip files \
 and copy .pak files into the game's mod folder where existing files will be overwritten. This \
-applies to disabled mods too, but they will not be activated upon running this command.
+applies to disabled and not-installed mods too, but they will not be activated upon running \
+this command.
 
 Options:
   This command does not have any options.
