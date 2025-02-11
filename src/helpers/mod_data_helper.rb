@@ -17,6 +17,14 @@ class ModDataHelper < BaseHelper
     self.data[uuid]["is_installed"] = is_installed
   end
 
+  def installed?(uuid)
+    return self.data.dig(uuid, "is_installed")
+  end
+
+  def set_updated(uuid)
+    self.data[uuid]["updated_at"] = Time.now.to_s
+  end
+
   def add_standard_entry(uuid, name)
     new_number = if self.data.values.size == 0
         1

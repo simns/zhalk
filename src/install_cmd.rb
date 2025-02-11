@@ -71,9 +71,9 @@ HELP
 
         if !@is_update
           self.insert_into_modsettings(info_json_helper)
-
-          self.update_mod_data(info_json_helper)
         end
+
+        self.update_mod_data(info_json_helper)
 
         self.copy_pak_files(mod_name)
 
@@ -140,6 +140,15 @@ HELP
   def update_mod_data(info_json_helper)
     uuid = info_json_helper.uuid
     name = info_json_helper.name
+
+    if @is_update
+      if @mod_data_helper.installed?(uuid)
+        @mod_data_helper.set_updated(uuid)
+        @mod_data_helper.save(with_logging: true)
+      end
+
+      return
+    end
 
     if @mod_data_helper.has?(uuid)
       @mod_data_helper.set_installed(uuid)

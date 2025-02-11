@@ -38,8 +38,9 @@ CONF
       allow(mod_data_helper).to receive(:puts)
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
       allow(modsettings_helper).to receive(:puts)
+      allow(InstallCmd).to receive(:new).and_return(install_cmd)
 
-      allow(update_cmd).to receive(:puts)
+      allow(install_cmd).to receive(:puts)
     end
 
     context "when there is one mod to be updated" do
@@ -53,7 +54,7 @@ CONF
             "created_at" => Time.now.to_s,
             "updated_at" => Time.now.to_s
           }
-        })
+        }.to_json)
 
         File.write(File.join("appdata", "PlayerProfiles", "Public", "modsettings.lsx"),
                    <<-XML
@@ -95,7 +96,7 @@ XML
 
         allow(install_cmd).to receive(:extract_mod_files) do
           FileUtils.mkdir_p(File.join("dump", "mod1"))
-          FileUtils.write(File.join("dump", "mod1", "mod1.pak"), "new pak")
+          File.write(File.join("dump", "mod1", "mod1.pak"), "new pak")
           File.write(File.join("dump", "mod1", "info.json"), {
             "Mods": [
               {
@@ -115,9 +116,25 @@ XML
         end
       end
 
-      it "asdf" do
-        expect()
+      it "does not modify modsettings" do
+        expect(install_cmd).to receive(:extract_mod_files)
+        expect(install_cmd).to_not receive(:insert_into_modsettings)
+        expect(install_cmd).to receive(:update_mod_data)
+        expect(install_cmd).to receive(:copy_pak_files)
+
         update_cmd.run
+      end
+
+      it "updates the 'updated_at' field in mod-data.json" do
+        expect(mod_data_helper).to receive(:set_updated)
+
+        update_cmd.run
+      end
+
+      it "copies and overwrites the pak files" do
+        update_cmd.run
+
+        expect(File.read(File.join("appdata", "Mods", "mod1.pak"))).to eq("new pak")
       end
     end
   end
