@@ -10,3 +10,6 @@ dump
 mods
 inactive
 mod-data.json
+
+# Logging
+logs
