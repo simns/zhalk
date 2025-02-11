@@ -17,22 +17,34 @@ that are already installed will be skipped.
 
 Options:
   --dry-run     Don't install anything. Only list what would be installed.
+  --update      Update all mods by reprocessing zip files in 'mods' folder. Same as 'update' command.
 
 Aliases:
   in, i
 HELP
   end
 
+  def process_args(args)
+    @is_update = args.include?("--update")
+
+    if @is_update
+      puts "Running an update. All mods inside the 'mods' folder will be re-processed."
+      puts
+    end
+  end
+
   def main(args)
     self.check_requirements!
+
+    self.process_args(args)
 
     self.make_modsettings_backup
 
     installed_mods = []
 
     Dir.glob(File.join(Constants::MODS_DIR, "*.zip")).each do |zip_file_name|
-      puts "==== Processing #{zip_file_name} ===="
       mod_name = /#{Constants::MODS_DIR}\/([\w\s\-\._'"]+)\.zip/.match(zip_file_name)[1]
+      puts "==== Processing #{mod_name} ===="
 
       if mod_name.nil?
         raise "Couldn't get mod name from zip file. Perhaps there are some unrecognized characters."
@@ -47,7 +59,7 @@ HELP
         info_json_helper.check_fields!
 
         mod_data_entry = @mod_data_helper.data[info_json_helper.uuid]
-        if mod_data_entry
+        if mod_data_entry && !@is_update
           if mod_data_entry["is_installed"]
             puts "Mod is marked as installed. Skipping."
             next
@@ -57,7 +69,9 @@ HELP
           end
         end
 
-        self.insert_into_modsettings(info_json_helper)
+        if !@is_update
+          self.insert_into_modsettings(info_json_helper)
+        end
 
         self.update_mod_data(info_json_helper)
 
@@ -65,7 +79,8 @@ HELP
 
         installed_mods << {
           name: mod_name,
-          type: :standard
+          type: :standard,
+          is_inactive: @is_update && !@mod_data_helper.installed?(info_json_helper.uuid)
         }
       else
         did_copy = self.copy_pak_files(mod_name)
@@ -83,7 +98,7 @@ HELP
   end
 
   def extract_mod_files(zip_file_name, mod_name)
-    if File.exist?(File.join(Constants::DUMP_DIR, mod_name))
+    if File.exist?(File.join(Constants::DUMP_DIR, mod_name)) && !@is_update
       puts "Zip file already extracted. Skipping."
       return
     end
@@ -127,6 +142,15 @@ HELP
     uuid = info_json_helper.uuid
     name = info_json_helper.name
 
+    if @is_update
+      if @mod_data_helper.installed?(uuid)
+        @mod_data_helper.set_updated(uuid)
+        @mod_data_helper.save(with_logging: true)
+      end
+
+      return
+    end
+
     if @mod_data_helper.has?(uuid)
       @mod_data_helper.set_installed(uuid)
     else
@@ -149,11 +173,21 @@ HELP
   def copy_pak_files(mod_name)
     did_copy = false
     Dir.glob(File.join(Constants::DUMP_DIR, mod_name, "*.pak")).each do |pak_file|
-      did_copy ||= self.safe_cp(
-        pak_file,
-        File.join(@config_helper.data["paths"]["appdata_dir"], "Mods"),
-        with_logging: true
-      )
+      if @is_update
+        FileUtils.cp(
+          pak_file,
+          File.join(@config_helper.data["paths"]["appdata_dir"], "Mods")
+        )
+        puts "Copied file #{File.basename(pak_file)}."
+
+        did_copy = true
+      else
+        did_copy ||= self.safe_cp(
+          pak_file,
+          File.join(@config_helper.data["paths"]["appdata_dir"], "Mods"),
+          with_logging: true
+        )
+      end
     end
 
     return did_copy
@@ -168,16 +202,18 @@ HELP
       standard_mods = installed_mods.select { |mod| mod[:type] == :standard }
       pak_only_mods = installed_mods.select { |mod| mod[:type] == :pak_only }
 
+      action_text = @is_update ? "updated files for" : "installed"
+
       puts "===== INSTALL REPORT ====="
-      puts "You installed #{self.num_mods(standard_mods.size, "standard")}."
-      puts standard_mods.map { |mod| "-> #{mod[:name]}" }
-      if standard_mods.size >= 1
+      puts "You #{action_text} #{self.num_mods(standard_mods.size, "standard")}."
+      puts standard_mods.map { |mod| "-> #{mod[:name]} #{mod[:is_inactive] ? "(inactive)" : ""}" }
+      if !@is_update && standard_mods.size >= 1
         puts "Nothing left to do for these."
       end
       puts ""
-      puts "You installed #{self.num_mods(pak_only_mods.size, "pak-only")}."
+      puts "You #{action_text} #{self.num_mods(pak_only_mods.size, "pak-only")}."
       puts pak_only_mods.map { |mod| "-> #{mod[:name]}" }
-      if pak_only_mods.size >= 1
+      if !@is_update && pak_only_mods.size >= 1
         puts "These mods need to be activated in the in-game mod manager."
       end
     end

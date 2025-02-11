@@ -18,6 +18,8 @@ when "init"
   InitCmd.new.run(*options)
 when "install", "in", "i"
   InstallCmd.new.run(*options)
+when "update", "up"
+  UpdateCmd.new.run(*options)
 when "list", "ls", "l"
   ListCmd.new.run(*options)
 when "refresh"
