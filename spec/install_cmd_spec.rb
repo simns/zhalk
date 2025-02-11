@@ -279,7 +279,6 @@ EXAMPLE
                  <<-CONF
 [paths]
 appdata_dir = "appdata"
-steam_dir = "steam"
 CONF
       )
       FileUtils.mkdir_p(File.join("appdata", "PlayerProfiles", "Public"))
