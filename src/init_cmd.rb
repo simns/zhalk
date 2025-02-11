@@ -22,7 +22,7 @@ HELP
   end
 
   def main(args)
-    @logger.debug("==>> Starting: init")
+    @logger.debug("===>> Starting: init")
 
     self.safe_mkdir(Constants::MODS_DIR, log_level: :info)
     self.safe_mkdir(Constants::DUMP_DIR, log_level: :info)

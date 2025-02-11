@@ -85,5 +85,7 @@ class BaseCmd
     if !File.exist?("conf.toml")
       raise "No conf.toml found. Make sure to run the 'init' command."
     end
+
+    @logger.debug("Finished #check_requirements!")
   end
 end
