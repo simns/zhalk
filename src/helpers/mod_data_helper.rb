@@ -3,6 +3,10 @@ require "date"
 require_relative "base_helper"
 
 class ModDataHelper < BaseHelper
+  def initialize(logger)
+    @logger = logger
+  end
+
   def data
     @data ||= self.get_json_data("mod-data.json")
 

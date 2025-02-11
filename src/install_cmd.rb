@@ -57,8 +57,12 @@ HELP
       info_json_helper = InfoJsonHelper.new(mod_name)
 
       if info_json_helper.file_present?
+        @logger.debug("Found an info.json file.")
+
         info_json_helper.load_data
         info_json_helper.check_fields!
+
+        @logger.debug("info.json is valid.")
 
         mod_data_entry = @mod_data_helper.data[info_json_helper.uuid]
         if mod_data_entry && !@is_update
@@ -120,6 +124,8 @@ HELP
   end
 
   def insert_into_modsettings(info_json_helper)
+    @logger.debug("Starting #insert_into_modsettings")
+
     modsettings = @modsettings_helper.data
 
     if modsettings.at_css("attribute#UUID[value='#{info_json_helper.uuid}']")
@@ -137,7 +143,7 @@ HELP
       }
     end
 
-    @modsettings_helper.save(builder, with_logging: true)
+    @modsettings_helper.save(builder, log_level: :info)
   end
 
   def update_mod_data(info_json_helper)
