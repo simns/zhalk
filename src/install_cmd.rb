@@ -147,25 +147,29 @@ HELP
   end
 
   def update_mod_data(info_json_helper)
+    @logger.debug("Starting #update_mod_data")
+
     uuid = info_json_helper.uuid
     name = info_json_helper.name
 
     if @is_update
       if @mod_data_helper.installed?(uuid)
+        @logger.debug("Updating so mod \"#{name}\" updated_at was updated.")
+
         @mod_data_helper.set_updated(uuid)
         @mod_data_helper.save(with_logging: true)
+      else
+        @logger.debug("Updating mods but \"#{name}\" seems to be inactive.")
       end
 
       return
     end
 
-    if @mod_data_helper.has?(uuid)
-      @mod_data_helper.set_installed(uuid)
-    else
+    if !@mod_data_helper.has?(uuid)
       @mod_data_helper.add_standard_entry(uuid, name)
-    end
 
-    @mod_data_helper.save(with_logging: true)
+      @mod_data_helper.save(with_logging: true)
+    end
   end
 
   def make_modsettings_backup

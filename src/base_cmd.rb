@@ -68,8 +68,10 @@ class BaseCmd
     end
   end
 
-  def num_mods(num, type)
-    num == 1 ? "1 #{type} mod" : "#{num} #{type} mods"
+  def num_mods(num, type = nil)
+    mod_noun = num == 1 ? "mod" : "mods"
+
+    return [num, type, mod_noun].compact.join(" ")
   end
 
   def num?(num)

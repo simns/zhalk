@@ -393,7 +393,7 @@ XML
                )
         end
 
-        it "updates mod-data.json" do
+        it "adds the mod to mod-data.json" do
           mod_data = JSON.parse(File.read("mod-data.json"))
           expect(mod_data).to include({
             "ce0be3e5-d6c4-4ace-a649-88d1dfdc23ab" => hash_including({

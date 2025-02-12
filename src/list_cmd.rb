@@ -27,10 +27,12 @@ HELP
   end
 
   def main(args)
+    @logger.debug("===>> Starting: list")
+
     self.check_requirements!
 
     if @mod_data_helper.data.keys.size == 0
-      puts "No mods installed yet."
+      @logger.info("No mods installed yet.")
       return
     end
 
@@ -50,6 +52,8 @@ HELP
         Time.parse(entry["updated_at"]).strftime("%a %b %d, %Y %T")
       ]
     end
+
+    @logger.debug("There are #{num_mods(mod_entry_rows.size)} installed.")
 
     table = Terminal::Table.new do |t|
       t.headings = ["#", "Active?", "Name", "Type", "Last installed"]
