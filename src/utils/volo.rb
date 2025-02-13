@@ -38,10 +38,17 @@ class Volo < Logger
   end
 
   def handle_log(msg, level, color = nil)
+    lines = msg
     if msg.is_a? String
-      self.add(LOG_LEVEL_MAP[level], msg)
-    elsif msg.is_a? Array
-      msg.each { |msg_part| self.add(LOG_LEVEL_MAP[level], msg_part) }
+      if msg == ""
+        lines = [""]
+      else
+        lines = msg.split("\n")
+      end
+    end
+
+    if lines.is_a? Array
+      lines.each { |line| self.add(LOG_LEVEL_MAP[level], line) }
     else
       raise ArgumentError, "Invalid msg for #handle_log."
     end

@@ -19,11 +19,15 @@ HELP
   end
 
   def main(args)
+    @logger.debug("===>> Starting: refresh")
+
     self.check_requirements!
 
-    puts "Reading from modsettings.lsx..."
+    @logger.info("Reading from modsettings.lsx...")
 
     starting_number = (@mod_data_helper.data.values.map { |mod| mod["number"] }.max || 0) + 1
+    @logger.debug("Next mod number would be #{starting_number}.")
+
     num_added = 0
 
     modsettings = @modsettings_helper.data
@@ -35,21 +39,30 @@ HELP
         raise "Did not find a UUID for mod #{name}"
       end
 
-      next if uuid == Constants::GUSTAV_DEV_UUID
+      @logger.debug("Found node: uuid: #{uuid}, name: \"#{name}\".")
+
+      if uuid == Constants::GUSTAV_DEV_UUID
+        @logger.debug("Not importing the Gustav entry.")
+        next
+      end
 
       if !@mod_data_helper.has?(uuid)
         @mod_data_helper.add_modsettings_entry(uuid, name, starting_number + num_added)
 
         num_added += 1
+
+        @logger.debug("==> mod-data.json does not have this entry, so I'm adding it.")
+      else
+        @logger.debug("mod-data.json already has this entry, so I'm skipping.")
       end
     end
 
     if num_added >= 1
       @mod_data_helper.save
 
-      puts "Saved #{self.num_mods(num_added, "new")} in mod-data.json."
+      @logger.info("Saved #{self.num_mods(num_added, "new")} in mod-data.json.")
     else
-      puts "No new entries."
+      @logger.info("No new entries.")
     end
   end
 end
