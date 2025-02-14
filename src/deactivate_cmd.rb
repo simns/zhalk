@@ -22,10 +22,12 @@ HELP
   end
 
   def main(args)
+    @logger.debug("===>> Starting: deactivate")
+
     self.check_requirements!
 
     if args[0].nil? || !self.num?(args[0])
-      puts "Invalid arg. Please pass a number corresponding to the mod."
+      @logger.error("Invalid arg. Please pass a number corresponding to the mod.")
       return
     end
 
@@ -33,15 +35,15 @@ HELP
     target_mod = @mod_data_helper.data.values.detect { |mod_obj| mod_obj["number"] == target_mod_number }
 
     if target_mod.nil?
-      puts "Could not find a mod with number: #{target_mod_number}."
+      @logger.error("Could not find a mod with number: #{target_mod_number}.")
       return
     elsif !target_mod["is_installed"]
-      puts "Target mod is already deactivated."
+      @logger.info("Target mod is already deactivated.")
       return
     end
 
-    puts "Deactivating mod:"
-    puts "-> #{target_mod["mod_name"]}"
+    @logger.info("Deactivating mod:")
+    @logger.info("-> #{target_mod["mod_name"]}")
 
     target_uuid = target_mod["uuid"]
 
@@ -51,7 +53,7 @@ HELP
 
     self.update_mod_data(target_uuid)
 
-    puts "Done."
+    @logger.info("Done.")
   end
 
   def create_xml_backup(target_uuid)
@@ -66,17 +68,19 @@ HELP
       File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"),
       mod_entry.to_xml
     )
+
+    @logger.info("Wrote modsettings entry into #{target_uuid}.xml.")
   end
 
   def remove_from_modsettings(target_uuid)
     @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']").parent.remove
 
-    @modsettings_helper.save(with_logging: true)
+    @modsettings_helper.save(log_level: :info)
   end
 
   def update_mod_data(target_uuid)
     @mod_data_helper.set_installed(target_uuid, false)
 
-    @mod_data_helper.save(with_logging: true)
+    @mod_data_helper.save(log_level: :info)
   end
 end

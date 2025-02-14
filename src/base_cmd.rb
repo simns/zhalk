@@ -8,7 +8,7 @@ require_relative "utils/volo"
 
 class BaseCmd
   def initialize
-    @logger = Volo.new(File.join(Constants::LOGS_DIR, "zhalk.log"), "daily")
+    @logger = Volo.new
 
     @config_helper = ConfigHelper.new
     @mod_data_helper = ModDataHelper.new(@logger)
@@ -21,6 +21,9 @@ class BaseCmd
     else
       self.main(args)
     end
+  rescue StandardError => error
+    @logger.error(error.message)
+    @logger.debug(error.backtrace)
   end
 
   def main(args)

@@ -12,10 +12,10 @@ class Volo < Logger
     error: Logger::ERROR
   }.freeze
 
-  def initialize(*args)
+  def initialize
     FileUtils.mkdir_p(Constants::LOGS_DIR)
 
-    super(*args)
+    super(File.join(Constants::LOGS_DIR, "zhalk.log"), "daily")
 
     config_helper = ConfigHelper.new
     @config = config_helper.data["logging"]
@@ -54,7 +54,7 @@ class Volo < Logger
     end
 
     if self.log_level_matches?(level)
-      self.handle_puts(msg, level, color)
+      self.handle_puts(lines, level, color)
     end
   end
 
@@ -67,20 +67,25 @@ class Volo < Logger
     return levels.index(level) >= levels.index(config_level)
   end
 
-  def handle_puts(msg, level, color)
-    new_msg = msg
-    if level == :warn || level == :error
-      new_msg = "#{level.to_s.upcase}: #{msg}"
+  def handle_puts(lines, level, color)
+    if level == :warn || level == :error || @config["log_level_in_stdout"]
+      lines = lines.map { |line| "#{level.to_s.upcase}: #{line}" }
     end
 
     if color
-      puts Rainbow(new_msg).color(color)
+      lines.each do |line|
+        puts Rainbow(line).color(color)
+      end
     elsif level == :warn
-      puts Rainbow(new_msg).yellow
+      lines.each do |line|
+        puts Rainbow(line).yellow
+      end
     elsif level == :error
-      puts Rainbow(new_msg).red
+      lines.each do |line|
+        puts Rainbow(line).red
+      end
     else
-      puts new_msg
+      puts lines
     end
   end
 end

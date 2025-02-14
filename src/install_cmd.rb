@@ -157,7 +157,7 @@ HELP
         @logger.debug("Updating so mod \"#{name}\" updated_at was updated.")
 
         @mod_data_helper.set_updated(uuid)
-        @mod_data_helper.save(with_logging: true)
+        @mod_data_helper.save(log_level: :info)
       else
         @logger.debug("Updating mods but \"#{name}\" seems to be inactive.")
       end
@@ -168,7 +168,7 @@ HELP
     if !@mod_data_helper.has?(uuid)
       @mod_data_helper.add_standard_entry(uuid, name)
 
-      @mod_data_helper.save(with_logging: true)
+      @mod_data_helper.save(log_level: :info)
     end
   end
 
