@@ -5,26 +5,28 @@ require "date"
 
 require_relative "../src/reorder_cmd"
 require_relative "../src/helpers/modsettings_helper"
-require_relative "../src/helpers/mod_data_helper"
 require_relative "../src/helpers/config_helper"
+require_relative "../src/utils/volo"
 
 RSpec.describe ReorderCmd do
   include FakeFS::SpecHelpers
 
-  describe "#reorder_cmd" do
+  let(:logger) { spy }
+
+  before do
+    allow(Volo).to receive(:new).and_return(logger)
+  end
+
+  describe "#run" do
     let(:reorder_cmd) { ReorderCmd.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper, logger) }
     let(:config_helper) { ConfigHelper.new }
-    let(:mod_data_helper) { ModDataHelper.new }
 
     before do
       FileUtils.touch("conf.toml")
 
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
       allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
-      allow(modsettings_helper).to receive(:puts)
-      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
-      allow(mod_data_helper).to receive(:puts)
       allow(reorder_cmd).to receive(:puts)
     end
 
@@ -36,7 +38,7 @@ RSpec.describe ReorderCmd do
       context "when modsettings.lsx has existing mods" do
         before do
           File.write("modsettings.lsx",
-                     <<-MODSETTINGS
+                     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -58,7 +60,7 @@ RSpec.describe ReorderCmd do
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
           )
 
           allow(STDIN).to receive(:gets).and_return("1")
@@ -69,7 +71,7 @@ MODSETTINGS
         it "stops because no mods were found" do
           expect(File.read("mod-data.json")).to eq("{}")
           expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-MODSETTINGS
+                                                    <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -91,7 +93,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
                                                   )
         end
       end
@@ -122,7 +124,7 @@ MODSETTINGS
       context "when modsettings.lsx has no existing mods" do
         before do
           File.write("modsettings.lsx",
-                     <<-MODSETTINGS
+                     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -145,7 +147,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
           )
 
           allow(STDIN).to receive(:gets).and_return("1", "e")
@@ -172,7 +174,7 @@ MODSETTINGS
 
         it "does not modify modsettings.lsx" do
           expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-MODSETTINGS
+                                                    <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -195,7 +197,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
                                                   )
         end
       end
@@ -204,7 +206,7 @@ MODSETTINGS
         context "when the user selects to move a mod after another mod" do
           before do
             File.write("modsettings.lsx",
-                       <<-MODSETTINGS
+                       <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -243,7 +245,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
             )
 
             allow(STDIN).to receive(:gets).and_return("1", "e")
@@ -270,7 +272,7 @@ MODSETTINGS
 
           it "modifies modsettings.lsx to reflect new order" do
             expect(File.read("modsettings.lsx")).to eq(
-                                                      <<-MODSETTINGS
+                                                      <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -309,7 +311,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
                                                     )
           end
         end
@@ -317,7 +319,7 @@ MODSETTINGS
         context "when the user incorrectly selects a mod to move after" do
           before do
             File.write("modsettings.lsx",
-                       <<-MODSETTINGS
+                       <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -356,7 +358,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
             )
 
             allow(STDIN).to receive(:gets).and_return("1,2", "a 2")
@@ -376,7 +378,7 @@ MODSETTINGS
       context "when modsettings.lsx has extra mods" do
         before do
           File.write("modsettings.lsx",
-                     <<-MODSETTINGS
+                     <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -439,7 +441,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
           )
 
           allow(STDIN).to receive(:gets).and_return("1", "e")
@@ -466,7 +468,7 @@ MODSETTINGS
 
         it "keeps extra mods at the beginning and found mods at the end in the order specified" do
           expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-MODSETTINGS
+                                                    <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -529,7 +531,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
                                                   )
         end
       end

@@ -2,6 +2,7 @@ require "pp"
 require "fakefs/spec_helpers"
 
 require_relative "../src/init_cmd"
+require_relative "../src/utils/volo"
 
 RSpec.describe InitCmd do
   include FakeFS::SpecHelpers
@@ -10,7 +11,7 @@ RSpec.describe InitCmd do
     let(:init_cmd) { InitCmd.new }
 
     before do
-      allow(init_cmd).to receive(:puts)
+      allow(Volo).to receive(:new).and_return(spy)
 
       FileUtils.touch("conf.toml.template")
     end

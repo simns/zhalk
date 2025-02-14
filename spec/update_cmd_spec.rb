@@ -9,15 +9,22 @@ require_relative "../src/install_cmd"
 require_relative "../src/helpers/modsettings_helper"
 require_relative "../src/helpers/mod_data_helper"
 require_relative "../src/helpers/config_helper"
+require_relative "../src/utils/volo"
 
 RSpec.describe UpdateCmd do
   include FakeFS::SpecHelpers
 
+  let(:logger) { spy }
+
+  before do
+    allow(Volo).to receive(:new).and_return(logger)
+  end
+
   describe "#run" do
     let(:update_cmd) { UpdateCmd.new }
     let(:install_cmd) { InstallCmd.new }
-    let(:mod_data_helper) { ModDataHelper.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:mod_data_helper) { ModDataHelper.new(logger) }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper, logger) }
     let(:config_helper) { ConfigHelper.new }
 
     before do
@@ -34,12 +41,8 @@ CONF
       FileUtils.mkdir("dump")
 
       allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
-      allow(mod_data_helper).to receive(:puts)
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
-      allow(modsettings_helper).to receive(:puts)
       allow(InstallCmd).to receive(:new).and_return(install_cmd)
-
-      allow(install_cmd).to receive(:puts)
     end
 
     context "when there is one mod to be updated" do

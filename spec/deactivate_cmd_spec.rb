@@ -5,25 +5,27 @@ require "date"
 
 require_relative "../src/deactivate_cmd"
 require_relative "../src/helpers/modsettings_helper"
-require_relative "../src/helpers/mod_data_helper"
 require_relative "../src/helpers/config_helper"
 require_relative "../src/helpers/constants"
+require_relative "../src/utils/volo"
 
 RSpec.describe DeactivateCmd do
   include FakeFS::SpecHelpers
 
+  let(:logger) { spy }
+
+  before do
+    allow(Volo).to receive(:new).and_return(logger)
+  end
+
   describe "#run" do
     let(:deactivate_cmd) { DeactivateCmd.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper, logger) }
     let(:config_helper) { ConfigHelper.new }
-    let(:mod_data_helper) { ModDataHelper.new }
 
     before do
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
       allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
-      allow(modsettings_helper).to receive(:puts)
-      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
-      allow(mod_data_helper).to receive(:puts)
 
       FileUtils.mkdir(Constants::INACTIVE_DIR)
 
@@ -75,8 +77,6 @@ RSpec.describe DeactivateCmd do
 </save>
 XML
         )
-
-        allow(deactivate_cmd).to receive(:puts)
 
         deactivate_cmd.run("1")
       end
@@ -174,12 +174,12 @@ XML
 </save>
 XML
         )
-
-        allow(deactivate_cmd).to receive(:puts)
       end
 
       it "raises an error before any backup is performed" do
-        expect { deactivate_cmd.run("1") }.to raise_error(StandardError)
+        expect(logger).to receive(:error).with("Could not find mod entry in modsettings.lsx. Cannot proceed.")
+
+        deactivate_cmd.run("1")
 
         expect(JSON.parse(File.read("mod-data.json"))).to include({
           "bd75eb6e-6998-48ef-836a-72c38ad08e9b" => hash_including({
@@ -253,14 +253,12 @@ XML
       end
 
       it "prints that the mod number cannot be found" do
-        expect { deactivate_cmd.run("1") }.to output(
-          "Could not find a mod with number: 1.\n"
-        ).to_stdout
+        expect(logger).to receive(:error).with("Could not find a mod with number: 1.")
+
+        deactivate_cmd.run("1")
       end
 
       it "does not modify anything" do
-        allow(deactivate_cmd).to receive(:puts)
-
         deactivate_cmd.run("1")
 
         expect(File.read("mod-data.json")).to eq("{}")
@@ -334,9 +332,9 @@ XML
       end
 
       it "prints that the target mod is already deactivated" do
-        expect { deactivate_cmd.run("1") }.to output(
-          "Target mod is already deactivated.\n"
-        ).to_stdout
+        expect(logger).to receive(:info).with("Target mod is already deactivated.")
+
+        deactivate_cmd.run("1")
       end
 
       it "does not modify anything" do

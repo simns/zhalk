@@ -6,32 +6,35 @@ require "date"
 require_relative "../src/refresh_cmd"
 require_relative "../src/helpers/modsettings_helper"
 require_relative "../src/helpers/config_helper"
+require_relative "../src/utils/volo"
 
 RSpec.describe RefreshCmd do
   include FakeFS::SpecHelpers
 
+  let(:logger) { spy }
+
   before do
     File.write("mod-data.json", "{}")
     File.write("conf.toml", "")
+
+    allow(Volo).to receive(:new).and_return(logger)
   end
 
   describe "#run" do
     let(:refresh_cmd) { RefreshCmd.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper, logger) }
     let(:config_helper) { ConfigHelper.new }
 
     before do
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
       allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
-      allow(modsettings_helper).to receive(:puts)
-      allow(refresh_cmd).to receive(:puts)
     end
 
     context "when there is nothing in the modsettings" do
       before do
         File.write("mod-data.json", "{}")
         File.write("modsettings.lsx",
-                   <<-MODSETTINGS
+                   <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -46,7 +49,7 @@ RSpec.describe RefreshCmd do
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
         )
 
         refresh_cmd.run
@@ -63,7 +66,9 @@ MODSETTINGS
       end
 
       it "raises an error that the file doesn't exist" do
-        expect { refresh_cmd.run }.to raise_error(Errno::ENOENT)
+        expect(logger).to receive(:error).with(/\ANo such file or directory/)
+
+        refresh_cmd.run
       end
     end
 
@@ -71,7 +76,7 @@ MODSETTINGS
       before do
         File.write("mod-data.json", "{}")
         File.write("modsettings.lsx",
-                   <<-MODSETTINGS
+                   <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -94,7 +99,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
         )
 
         refresh_cmd.run
@@ -127,7 +132,7 @@ MODSETTINGS
           }
         }.to_json)
         File.write("modsettings.lsx",
-                   <<-MODSETTINGS
+                   <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -150,7 +155,7 @@ MODSETTINGS
     </node>
   </region>
 </save>
-MODSETTINGS
+XML
         )
 
         refresh_cmd.run
