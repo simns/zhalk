@@ -6,22 +6,27 @@ require "date"
 
 require_relative "../src/install_cmd"
 require_relative "../src/helpers/modsettings_helper"
-require_relative "../src/helpers/mod_data_helper"
 require_relative "../src/helpers/config_helper"
 require_relative "../src/helpers/info_json_helper"
+require_relative "../src/utils/volo"
 
 RSpec.describe InstallCmd do
   include FakeFS::SpecHelpers
 
+  let(:logger) { spy }
+
+  before do
+    allow(Volo).to receive(:new).and_return(logger)
+  end
+
   describe "#insert_into_modsettings" do
     let(:install_cmd) { InstallCmd.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper, logger) }
     let(:config_helper) { ConfigHelper.new }
 
     before do
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
       allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
-      allow(modsettings_helper).to receive(:puts)
     end
 
     context "when there aren't existing mods" do
@@ -114,7 +119,7 @@ XML
 
       before do
         File.write("modsettings.lsx",
-                   <<-EXAMPLE
+                   <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -144,21 +149,15 @@ XML
     </node>
   </region>
 </save>
-EXAMPLE
+XML
         )
-      end
-
-      it "warns that the entry already exists" do
-        expect {
-          install_cmd.insert_into_modsettings(info_json_helper)
-        }.to output("WARN: Mod entry already exists in modsettings.lsx.\n").to_stdout
       end
 
       it "doesn't modify anything" do
         install_cmd.insert_into_modsettings(info_json_helper)
 
         expect(File.read("modsettings.lsx")).to eq(
-                                                  <<-EXAMPLE
+                                                  <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <save>
   <version major="4" minor="7" revision="1" build="300"/>
@@ -188,7 +187,7 @@ EXAMPLE
     </node>
   </region>
 </save>
-EXAMPLE
+XML
                                                 )
       end
     end
@@ -196,12 +195,6 @@ EXAMPLE
 
   describe "#update_mod_data" do
     let(:install_cmd) { InstallCmd.new }
-    let(:mod_data_helper) { ModDataHelper.new }
-
-    before do
-      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
-      allow(mod_data_helper).to receive(:puts)
-    end
 
     context "when mod-data.json is empty" do
       let(:info_json_helper) do
@@ -252,11 +245,11 @@ EXAMPLE
         install_cmd.update_mod_data(info_json_helper)
       end
 
-      it "updates the entry to be installed" do
+      it "ignores the uninstalled entry" do
         mod_data = JSON.parse(File.read("mod-data.json"))
         expect(mod_data).to include({
           "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b" => hash_including({
-            "is_installed" => true,
+            "is_installed" => false,
             "mod_name" => "Test Mod",
             "uuid" => "18f35d9d-aaaa-4df6-8d3e-c2cdc5ae0c1b",
             "number" => 1
@@ -269,8 +262,6 @@ EXAMPLE
 
   describe "#run" do
     let(:install_cmd) { InstallCmd.new }
-    let(:mod_data_helper) { ModDataHelper.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
     let(:config_helper) { ConfigHelper.new }
 
     before do
@@ -311,13 +302,6 @@ XML
       )
       FileUtils.mkdir("mods")
       FileUtils.mkdir("dump")
-
-      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
-      allow(mod_data_helper).to receive(:puts)
-      allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
-      allow(modsettings_helper).to receive(:puts)
-
-      allow(install_cmd).to receive(:puts)
     end
 
     context "when all necessary files exist" do
@@ -393,7 +377,7 @@ XML
                )
         end
 
-        it "updates mod-data.json" do
+        it "adds the mod to mod-data.json" do
           mod_data = JSON.parse(File.read("mod-data.json"))
           expect(mod_data).to include({
             "ce0be3e5-d6c4-4ace-a649-88d1dfdc23ab" => hash_including({

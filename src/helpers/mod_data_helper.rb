@@ -3,6 +3,10 @@ require "date"
 require_relative "base_helper"
 
 class ModDataHelper < BaseHelper
+  def initialize(logger)
+    @logger = logger
+  end
+
   def data
     @data ||= self.get_json_data("mod-data.json")
 
@@ -55,13 +59,11 @@ class ModDataHelper < BaseHelper
     }
   end
 
-  def save(with_logging: false)
+  def save(log_level: :debug)
     return if self.data.nil?
 
     self.save_json_data("mod-data.json", self.data)
 
-    if with_logging
-      puts "Wrote data to mod-data.json."
-    end
+    @logger.handle_log("Wrote data to mod-data.json.", log_level)
   end
 end

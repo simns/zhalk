@@ -3,12 +3,16 @@ require "fileutils"
 require_relative "helpers/config_helper"
 require_relative "helpers/mod_data_helper"
 require_relative "helpers/modsettings_helper"
+require_relative "helpers/constants"
+require_relative "utils/volo"
 
 class BaseCmd
   def initialize
+    @logger = Volo.new
+
     @config_helper = ConfigHelper.new
-    @mod_data_helper = ModDataHelper.new
-    @modsettings_helper = ModsettingsHelper.new(@config_helper)
+    @mod_data_helper = ModDataHelper.new(@logger)
+    @modsettings_helper = ModsettingsHelper.new(@config_helper, @logger)
   end
 
   def run(*args)
@@ -17,6 +21,9 @@ class BaseCmd
     else
       self.main(args)
     end
+  rescue StandardError => error
+    @logger.error(error.message)
+    @logger.debug(error.backtrace)
   end
 
   def main(args)
@@ -27,16 +34,18 @@ class BaseCmd
     raise NoMethodError
   end
 
-  def safe_mkdir(name, with_logging: false)
+  def safe_mkdir(name, log_level: :debug)
+    @logger.debug("Starting safe_mkdir for #{name}")
+
     if !Dir.exist?(name)
       Dir.mkdir(name)
-      puts "Created dir \"#{name}\"." if with_logging
+      @logger.handle_log("Created dir \"#{name}\".", log_level)
     else
-      puts "Dir \"#{name}\" already exists." if with_logging
+      @logger.handle_log("Dir \"#{name}\" already exists.", log_level)
     end
   end
 
-  def safe_cp(src, dest, with_logging: false)
+  def safe_cp(src, dest, log_level: :debug)
     updated_dest = dest
     basename = File.basename(src)
     if File.directory?(dest)
@@ -45,25 +54,27 @@ class BaseCmd
 
     if !File.exist?(updated_dest)
       FileUtils.cp(src, updated_dest)
-      puts "Created file #{File.basename(updated_dest)}." if with_logging
+      @logger.handle_log("Created file #{File.basename(updated_dest)}.", log_level)
       return true
     else
-      puts "File #{File.basename(updated_dest)} already exists." if with_logging
+      @logger.handle_log("File #{File.basename(updated_dest)} already exists.", log_level)
       return false
     end
   end
 
-  def safe_create(filename, content: "", with_logging: false)
+  def safe_create(filename, content: "", log_level: :debug)
     if !File.exist?(filename)
       File.write(filename, content)
-      puts "Created file #{filename}." if with_logging
+      @logger.handle_log("Created file #{filename}.", log_level)
     else
-      puts "File #{filename} already exists." if with_logging
+      @logger.handle_log("File #{filename} already exists.", log_level)
     end
   end
 
-  def num_mods(num, type)
-    num == 1 ? "1 #{type} mod" : "#{num} #{type} mods"
+  def num_mods(num, type = nil)
+    mod_noun = num == 1 ? "mod" : "mods"
+
+    return [num, type, mod_noun].compact.join(" ")
   end
 
   def num?(num)
@@ -79,5 +90,7 @@ class BaseCmd
     if !File.exist?("conf.toml")
       raise "No conf.toml found. Make sure to run the 'init' command."
     end
+
+    @logger.debug("Finished #check_requirements!")
   end
 end

@@ -29,10 +29,12 @@ HELP
   end
 
   def main(args)
+    @logger.debug("===>> Starting: activate")
+
     self.check_requirements!
 
     if args[0].nil? || !self.num?(args[0])
-      puts "Invalid arg. Please pass a number corresponding to the mod."
+      @logger.error("Invalid arg. Please pass a number corresponding to the mod.")
       return
     end
 
@@ -40,15 +42,15 @@ HELP
     target_mod = @mod_data_helper.data.values.detect { |mod_obj| mod_obj["number"] == target_mod_number }
 
     if target_mod.nil?
-      puts "Could not find a mod with number: #{target_mod_number}."
+      @logger.error("Could not find a mod with number: #{target_mod_number}.")
       return
     elsif target_mod["is_installed"]
-      puts "Target mod is already active."
+      @logger.info("Target mod is already active.")
       return
     end
 
-    puts "Reactivating mod:"
-    puts "-> #{target_mod["mod_name"]}"
+    @logger.info("Reactivating mod:")
+    @logger.info("-> #{target_mod["mod_name"]}")
 
     target_uuid = target_mod["uuid"]
 
@@ -58,7 +60,7 @@ HELP
 
     self.delete_inactive_backup(target_uuid)
 
-    puts "Done."
+    @logger.info("Done.")
   end
 
   def load_inactive_into_modsettings(target_uuid)
@@ -69,6 +71,9 @@ HELP
 
     inactive_mod_doc = @base_helper.get_xml_data(inactive_mod_filepath)
     inactive_entry = inactive_mod_doc.at_css("node#ModuleShortDesc")
+
+    @logger.debug("Loaded in #{target_uuid}.xml:")
+    @logger.debug(inactive_mod_doc.to_xml)
 
     if inactive_entry.nil?
       raise "Could not find inactive mod entry in the backup file."
@@ -90,17 +95,19 @@ HELP
       mods
     )
 
-    @modsettings_helper.save(with_logging: true)
+    @modsettings_helper.save(log_level: :info)
   end
 
   def update_mod_data(target_uuid)
+    @logger.debug("Setting is_installed to true.")
+
     @mod_data_helper.set_installed(target_uuid)
 
-    @mod_data_helper.save(with_logging: true)
+    @mod_data_helper.save(log_level: :info)
   end
 
   def delete_inactive_backup(target_uuid)
     # TODO: Implement
-    puts "Backup file will not be deleted for now. Feel free to delete it manually."
+    @logger.info("Backup file will not be deleted for now. Feel free to delete it manually.")
   end
 end

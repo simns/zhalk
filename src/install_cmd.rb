@@ -28,12 +28,14 @@ HELP
     @is_update = args.include?("--update")
 
     if @is_update
-      puts "Running an update. All mods inside the 'mods' folder will be re-processed."
-      puts
+      @logger.info("Running an update. All mods inside the 'mods' folder will be re-processed.")
+      @logger.info("")
     end
   end
 
   def main(args)
+    @logger.debug("===>> Starting: install")
+
     self.check_requirements!
 
     self.process_args(args)
@@ -44,7 +46,7 @@ HELP
 
     Dir.glob(File.join(Constants::MODS_DIR, "*.zip")).each do |zip_file_name|
       mod_name = /#{Constants::MODS_DIR}\/([\w\s\-\._'"]+)\.zip/.match(zip_file_name)[1]
-      puts "==== Processing #{mod_name} ===="
+      @logger.info("==== Processing #{mod_name} ====")
 
       if mod_name.nil?
         raise "Couldn't get mod name from zip file. Perhaps there are some unrecognized characters."
@@ -55,16 +57,20 @@ HELP
       info_json_helper = InfoJsonHelper.new(mod_name)
 
       if info_json_helper.file_present?
+        @logger.debug("Found an info.json file.")
+
         info_json_helper.load_data
         info_json_helper.check_fields!
+
+        @logger.debug("info.json is valid.")
 
         mod_data_entry = @mod_data_helper.data[info_json_helper.uuid]
         if mod_data_entry && !@is_update
           if mod_data_entry["is_installed"]
-            puts "Mod is marked as installed. Skipping."
+            @logger.info("Mod is marked as installed. Skipping.")
             next
           else
-            puts "Mod is marked as inactive. Skipping."
+            @logger.info("Mod is marked as inactive. Skipping.")
             next
           end
         end
@@ -99,13 +105,13 @@ HELP
 
   def extract_mod_files(zip_file_name, mod_name)
     if File.exist?(File.join(Constants::DUMP_DIR, mod_name)) && !@is_update
-      puts "Zip file already extracted. Skipping."
+      @logger.info("Zip file already extracted. Skipping.")
       return
     end
 
     self.safe_mkdir(File.join(Constants::DUMP_DIR, mod_name))
 
-    puts "Extracting..."
+    @logger.info("Extracting...")
 
     Zip::File.open(zip_file_name) do |zip_file|
       zip_file.each do |entry|
@@ -114,14 +120,16 @@ HELP
       end
     end
 
-    puts "Successfully extracted zip file."
+    @logger.info("Successfully extracted zip file.")
   end
 
   def insert_into_modsettings(info_json_helper)
+    @logger.debug("Starting #insert_into_modsettings")
+
     modsettings = @modsettings_helper.data
 
     if modsettings.at_css("attribute#UUID[value='#{info_json_helper.uuid}']")
-      puts "WARN: Mod entry already exists in modsettings.lsx."
+      @logger.warn("Mod entry already exists in modsettings.lsx.")
       return
     end
 
@@ -135,38 +143,47 @@ HELP
       }
     end
 
-    @modsettings_helper.save(builder, with_logging: true)
+    @modsettings_helper.save(builder, log_level: :info)
   end
 
   def update_mod_data(info_json_helper)
+    @logger.debug("Starting #update_mod_data")
+
     uuid = info_json_helper.uuid
     name = info_json_helper.name
 
     if @is_update
       if @mod_data_helper.installed?(uuid)
+        @logger.debug("Updating so mod \"#{name}\" updated_at was updated.")
+
         @mod_data_helper.set_updated(uuid)
-        @mod_data_helper.save(with_logging: true)
+        @mod_data_helper.save(log_level: :info)
+      else
+        @logger.debug("Updating mods but \"#{name}\" seems to be inactive.")
       end
 
       return
     end
 
-    if @mod_data_helper.has?(uuid)
-      @mod_data_helper.set_installed(uuid)
-    else
+    if !@mod_data_helper.has?(uuid)
       @mod_data_helper.add_standard_entry(uuid, name)
-    end
 
-    @mod_data_helper.save(with_logging: true)
+      @mod_data_helper.save(log_level: :info)
+    end
   end
 
   def make_modsettings_backup
+    @logger.debug("Checking modsettings backup..")
+
     FileUtils.cd(@modsettings_helper.modsettings_dir) do
-      return if File.exist?("modsettings.lsx.bak")
+      if File.exist?("modsettings.lsx.bak")
+        @logger.debug("modsettings.lsx.bak already exists.")
+        return
+      end
 
       FileUtils.cp("modsettings.lsx", "modsettings.lsx.bak")
 
-      puts "Made backup of modsettings.lsx file."
+      @logger.info("Made backup of modsettings.lsx file.")
     end
   end
 
@@ -178,14 +195,14 @@ HELP
           pak_file,
           File.join(@config_helper.data["paths"]["appdata_dir"], "Mods")
         )
-        puts "Copied file #{File.basename(pak_file)}."
+        @logger.info("Copied file #{File.basename(pak_file)}.")
 
         did_copy = true
       else
         did_copy ||= self.safe_cp(
           pak_file,
           File.join(@config_helper.data["paths"]["appdata_dir"], "Mods"),
-          with_logging: true
+          log_level: :info
         )
       end
     end
@@ -194,27 +211,27 @@ HELP
   end
 
   def print_install_report(installed_mods)
-    puts
+    @logger.info("")
 
     if installed_mods.size == 0
-      puts "Nothing to do."
+      @logger.info("Nothing to do.")
     else
       standard_mods = installed_mods.select { |mod| mod[:type] == :standard }
       pak_only_mods = installed_mods.select { |mod| mod[:type] == :pak_only }
 
       action_text = @is_update ? "updated files for" : "installed"
 
-      puts "===== INSTALL REPORT ====="
-      puts "You #{action_text} #{self.num_mods(standard_mods.size, "standard")}."
-      puts standard_mods.map { |mod| "-> #{mod[:name]} #{mod[:is_inactive] ? "(inactive)" : ""}" }
+      @logger.info("===== INSTALL REPORT =====")
+      @logger.info("You #{action_text} #{self.num_mods(standard_mods.size, "standard")}.")
+      @logger.info(standard_mods.map { |mod| "-> #{mod[:name]} #{mod[:is_inactive] ? "(inactive)" : ""}" })
       if !@is_update && standard_mods.size >= 1
-        puts "Nothing left to do for these."
+        @logger.info("Nothing left to do for these.")
       end
-      puts ""
-      puts "You #{action_text} #{self.num_mods(pak_only_mods.size, "pak-only")}."
-      puts pak_only_mods.map { |mod| "-> #{mod[:name]}" }
+      @logger.info("")
+      @logger.info("You #{action_text} #{self.num_mods(pak_only_mods.size, "pak-only")}.")
+      @logger.info(pak_only_mods.map { |mod| "-> #{mod[:name]}" })
       if !@is_update && pak_only_mods.size >= 1
-        puts "These mods need to be activated in the in-game mod manager."
+        @logger.info("These mods need to be activated in the in-game mod manager.")
       end
     end
   end

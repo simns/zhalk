@@ -11,6 +11,7 @@ GEM
       racc (~> 1.4)
     parslet (2.0.0)
     racc (1.8.1)
+    rainbow (3.1.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -38,6 +39,7 @@ PLATFORMS
 DEPENDENCIES
   fakefs (~> 3.0.0)
   nokogiri (~> 1.18.2)
+  rainbow
   rspec (~> 3.13.0)
   rubyzip (~> 2.4.1)
   terminal-table (~> 3.0.2)

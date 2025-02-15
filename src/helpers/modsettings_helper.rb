@@ -1,12 +1,13 @@
 require_relative "base_helper"
 
 class ModsettingsHelper < BaseHelper
-  def initialize(config_helper)
+  def initialize(config_helper, logger)
     if config_helper.nil?
       raise ArgumentError, "ModsettingsHelper must accept a valid ConfigHelper."
     end
 
     @config_helper = config_helper
+    @logger = logger
   end
 
   def data
@@ -16,7 +17,7 @@ class ModsettingsHelper < BaseHelper
     return @data
   end
 
-  def save(doc = nil, with_logging: false)
+  def save(doc = nil, log_level: :debug)
     File.open(@filepath, "w") do |f|
       if doc
         f.write(doc.to_xml)
@@ -25,9 +26,7 @@ class ModsettingsHelper < BaseHelper
       end
     end
 
-    if with_logging
-      puts "Wrote data to modsettings.lsx."
-    end
+    @logger.handle_log("Wrote data to modsettings.lsx.", log_level)
   end
 
   def modsettings_dir

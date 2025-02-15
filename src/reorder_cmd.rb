@@ -21,17 +21,20 @@ HELP
   end
 
   def main(args)
+    @logger.debug("===>> Starting: reorder")
+
     self.check_requirements!
 
     table = ListCmd.new.construct_mod_table
 
     puts table
-    puts "Select mods by typing a comma-separated list of numbers."
+    @logger.info("Select mods by typing a comma-separated list of numbers.")
 
     mod_numbers = STDIN.gets.strip
+    @logger.debug("User input: #{mod_numbers}")
 
     if !self.valid_mod_nums?(mod_numbers)
-      puts "Invalid selection."
+      @logger.error("Invalid selection.")
       return
     end
 
@@ -43,26 +46,28 @@ HELP
       .map { |mod_obj| mod_obj["mod_name"] }
 
     if selected_mod_names.empty?
-      puts "No mods with those numbers."
+      @logger.error("No mods with those numbers.")
       return
+    elsif selected_mod_names.size != mod_numbers.size
+      @logger.warn("Some mod numbers did not match with a mod.")
     end
 
-    puts
+    @logger.info("")
+    @logger.info("You have selected:")
+    @logger.info(selected_mod_names.map { |mod_name| "-> #{mod_name}" })
 
-    puts "You have selected:"
-    puts selected_mod_names.map { |mod_name| "-> #{mod_name}" }
-
-    puts
-
-    puts <<~ACTIONS
-           Choose one of these actions by typing the letter with any arguments:
-            [b] Place at beginning
-            [e] Place at end
-            [a] Place after some [mod number]
-            [c] Cancel
-         ACTIONS
+    @logger.info("")
+    @logger.info(<<~ACTIONS
+      Choose one of these actions by typing the letter with any arguments:
+       [b] Place at beginning
+       [e] Place at end
+       [a] Place after some [mod number]
+       [c] Cancel
+    ACTIONS
+    )
 
     command = STDIN.gets.strip
+    @logger.debug("User input: #{command}")
 
     existing_mod_objs = mod_objs.sort_by { |mod_obj| mod_obj["number"] }
 
@@ -70,6 +75,8 @@ HELP
   end
 
   def process_command(command, mod_numbers, mod_objs)
+    @logger.debug("Starting #process_command")
+
     command_parts = command.split(" ")
 
     mods_to_move = mod_objs.select { |mod_obj| mod_numbers.include?(mod_obj["number"]) }
@@ -87,15 +94,15 @@ HELP
       mod_objs.insert(-1, *mods_to_move)
     when "a"
       if mod_numbers.include?(command_parts[1].to_i)
-        puts "The mod you’re placing the others after cannot be part of the moving set. Please choose another."
+        @logger.error("The mod you're placing the others after cannot be part of the moving set. Please choose another.")
         return
       end
       return if !self.put_after_mod(command_parts[1], mods_to_move, mod_objs)
     when "c"
-      puts "Cancelling."
+      @logger.info("Cancelling.")
       return
     else
-      puts "Unknown command."
+      @logger.error("Unknown command.")
       return
     end
 
@@ -103,7 +110,7 @@ HELP
 
     self.write_new_modsettings
 
-    puts "Finished reordering mods."
+    @logger.info("Finished reordering mods.")
   end
 
   def put_after_mod(after_this_mod, mods_to_move, mod_objs)
@@ -115,11 +122,11 @@ HELP
       if mod_index
         mod_objs.insert(mod_index + 1, *mods_to_move)
       else
-        puts "Could not find the mod with number #{after_this_mod}."
+        @logger.error("Could not find the mod with number #{after_this_mod}.")
         return false
       end
     else
-      puts "Input after 'a' must be a single number corresponding to a mod."
+      @logger.error("Input after 'a' must be a single number corresponding to a mod.")
       return false
     end
 
@@ -131,7 +138,7 @@ HELP
       @mod_data_helper.data[mod_obj["uuid"]]["number"] = index + 1
     end
 
-    @mod_data_helper.save(with_logging: true)
+    @mod_data_helper.save(log_level: :info)
   end
 
   def write_new_modsettings
@@ -149,7 +156,7 @@ HELP
 
     parent_node.children = Nokogiri::XML::NodeSet.new(modsettings, mod_entries)
 
-    @modsettings_helper.save(with_logging: true)
+    @modsettings_helper.save(log_level: :info)
   end
 
   def valid_mod_nums?(mod_numbers)

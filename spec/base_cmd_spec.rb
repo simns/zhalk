@@ -7,6 +7,11 @@ RSpec.describe BaseCmd do
   include FakeFS::SpecHelpers
 
   let(:base_cmd) { BaseCmd.new }
+  let(:logger) { spy }
+
+  before do
+    allow(Volo).to receive(:new).and_return(logger)
+  end
 
   describe "#safe_mkdir" do
     context "when no directory exists" do

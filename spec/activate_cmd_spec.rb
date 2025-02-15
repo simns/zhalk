@@ -7,22 +7,25 @@ require_relative "../src/activate_cmd"
 require_relative "../src/helpers/modsettings_helper"
 require_relative "../src/helpers/config_helper"
 require_relative "../src/helpers/constants"
+require_relative "../src/utils/volo"
 
 RSpec.describe ActivateCmd do
   include FakeFS::SpecHelpers
 
+  let(:logger) { spy }
+
+  before do
+    allow(Volo).to receive(:new).and_return(logger)
+  end
+
   describe "#run" do
     let(:activate_cmd) { ActivateCmd.new }
-    let(:modsettings_helper) { ModsettingsHelper.new(config_helper) }
+    let(:modsettings_helper) { ModsettingsHelper.new(config_helper, logger) }
     let(:config_helper) { ConfigHelper.new }
-    let(:mod_data_helper) { ModDataHelper.new }
 
     before do
       allow(ModsettingsHelper).to receive(:new).and_return(modsettings_helper)
       allow(modsettings_helper).to receive(:modsettings_dir).and_return(".")
-      allow(modsettings_helper).to receive(:puts)
-      allow(ModDataHelper).to receive(:new).and_return(mod_data_helper)
-      allow(mod_data_helper).to receive(:puts)
 
       FileUtils.mkdir(Constants::INACTIVE_DIR)
 
@@ -78,8 +81,6 @@ XML
 </node>
 XML
         )
-
-        allow(activate_cmd).to receive(:puts)
 
         activate_cmd.run("1")
       end
@@ -187,12 +188,12 @@ XML
 </save>
 XML
         )
-
-        allow(activate_cmd).to receive(:puts)
       end
 
       it "raises an error before any activation is performed" do
-        expect { activate_cmd.run("1") }.to raise_error(StandardError, "Could not find inactive mod's backup xml file.")
+        expect(logger).to receive(:error).with("Could not find inactive mod's backup xml file.")
+
+        activate_cmd.run("1")
 
         expect(JSON.parse(File.read("mod-data.json"))).to include({
           "f9e8c1a5-0932-4c99-89c4-a24ea6d9c160" => hash_including({
@@ -271,14 +272,12 @@ XML
       end
 
       it "prints that the mod number cannot be found" do
-        expect { activate_cmd.run("1") }.to output(
-          "Could not find a mod with number: 1.\n"
-        ).to_stdout
+        expect(logger).to receive(:error).with("Could not find a mod with number: 1.")
+
+        activate_cmd.run("1")
       end
 
       it "does not modify anything" do
-        allow(activate_cmd).to receive(:puts)
-
         activate_cmd.run("1")
 
         expect(File.read("mod-data.json")).to eq("{}")
@@ -368,12 +367,12 @@ XML
 </node>
 XML
         )
-
-        allow(activate_cmd).to receive(:puts)
       end
 
       it "raises an error before any activation is performed" do
-        expect { activate_cmd.run("1") }.to raise_error(StandardError, "Could not find inactive mod entry in the backup file.")
+        expect(logger).to receive(:error).with("Could not find inactive mod entry in the backup file.")
+
+        activate_cmd.run("1")
 
         expect(JSON.parse(File.read("mod-data.json"))).to include({
           "dbc9693e-2448-42b0-8688-722a0ae285cc" => hash_including({
@@ -461,9 +460,9 @@ XML
       end
 
       it "prints that the target mod is already deactivated" do
-        expect { activate_cmd.run("1") }.to output(
-          "Target mod is already active.\n"
-        ).to_stdout
+        expect(logger).to receive(:info).with("Target mod is already active.")
+
+        activate_cmd.run("1")
       end
 
       it "does not modify anything" do
