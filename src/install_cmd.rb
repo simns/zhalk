@@ -45,12 +45,9 @@ HELP
     installed_mods = []
 
     Dir.glob(File.join(Constants::MODS_DIR, "*.zip")).each do |zip_file_name|
-      mod_name = /#{Constants::MODS_DIR}\/([\w\s\-\._'"]+)\.zip/.match(zip_file_name)[1]
-      @logger.info("==== Processing #{mod_name} ====")
+      mod_name = File.basename(zip_file_name).sub(/\.zip\z/, "")
 
-      if mod_name.nil?
-        raise "Couldn't get mod name from zip file. Perhaps there are some unrecognized characters."
-      end
+      @logger.info("==== Processing #{mod_name} ====")
 
       self.extract_mod_files(zip_file_name, mod_name)
 
