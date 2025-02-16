@@ -28,7 +28,7 @@ class ListCmd < BaseCmd
     HELP
   end
 
-  def main(args)
+  def main(_args)
     @logger.debug("===>> Starting: list")
 
     self.check_requirements!

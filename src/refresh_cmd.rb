@@ -20,7 +20,7 @@ class RefreshCmd < BaseCmd
     HELP
   end
 
-  def main(args)
+  def main(_args)
     @logger.debug("===>> Starting: refresh")
 
     self.check_requirements!
