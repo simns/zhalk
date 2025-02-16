@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "terminal-table"
 require "date"
 
@@ -7,23 +9,23 @@ class ListCmd < BaseCmd
   MOD_TYPE_MAP = {
     "standard" => "Standard",
     "from_modsettings" => "From modsettings"
-  }
+  }.freeze
 
   def help
-    <<-HELP
-Usage:
-  zhalk list [options]
+    <<~HELP
+      Usage:
+        zhalk list [options]
 
-Description:
-  This lists mods in a table. By default, the table shows active and inactive mods.
+      Description:
+        This lists mods in a table. By default, the table shows active and inactive mods.
 
-Options:
-  --active      Show only active mods
-  --inactive    Show only inactive mods
+      Options:
+        --active      Show only active mods
+        --inactive    Show only inactive mods
 
-Aliases:
-  ls, l
-HELP
+      Aliases:
+        ls, l
+    HELP
   end
 
   def main(args)
@@ -31,7 +33,7 @@ HELP
 
     self.check_requirements!
 
-    if @mod_data_helper.data.keys.size == 0
+    if @mod_data_helper.data.keys.empty?
       @logger.info("No mods installed yet.")
       return
     end

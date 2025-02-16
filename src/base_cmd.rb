@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "fileutils"
 
 require_relative "helpers/config_helper"
@@ -26,7 +28,7 @@ class BaseCmd
     @logger.debug(error.backtrace)
   end
 
-  def main(args)
+  def main(_args)
     raise NoMethodError
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Constants
   MODS_DIR = "mods"
   DUMP_DIR = "dump"

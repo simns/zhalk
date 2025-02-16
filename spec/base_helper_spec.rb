@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pp"
 require "fakefs/spec_helpers"
 require "json"
@@ -12,13 +14,13 @@ RSpec.describe BaseHelper do
   describe "#get_json_data" do
     context "when the json file exists" do
       before do
-        File.write("data.json", %q[{"foo": "bar"}])
+        File.write("data.json", '{"foo": "bar"}')
       end
 
       it "loads the json file" do
         expect(base_helper.get_json_data("data.json")).to eq({
-                                                            "foo" => "bar"
-                                                          })
+          "foo" => "bar"
+        })
       end
     end
   end
@@ -31,8 +33,8 @@ RSpec.describe BaseHelper do
 
       it "saves the json" do
         expect(JSON.parse(File.read("data.json"))).to eq({
-                                                        "bar" => "dat"
-                                                      })
+          "bar" => "dat"
+        })
       end
     end
   end

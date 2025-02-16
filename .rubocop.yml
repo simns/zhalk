@@ -1,12 +1,3 @@
-Style/Documentation:
-  Enabled: false
-
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-Style/RedundantSelf:
-  Enabled: false
-
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 
@@ -16,11 +7,56 @@ Layout/FirstHashElementIndentation:
 Layout/LineLength:
   Max: 100
 
+Lint/MissingSuper:
+  Enabled: false
+
 Lint/RedundantRequireStatement:
+  Enabled: false
+
+Metrics/AbcSize:
   Enabled: false
 
 Metrics/BlockLength:
   Enabled: false
 
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/MethodLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/RedundantReturn:
+  Enabled: false
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Style/IfUnlessModifier:
   Enabled: false

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 require "nokogiri"
 
@@ -10,7 +12,7 @@ class BaseHelper
 
   def get_json_data(filename)
     File.open(filename) do |file|
-      return JSON.load(file)
+      return JSON.load_file(file)
     end
   end
 

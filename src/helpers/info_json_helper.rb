@@ -1,12 +1,10 @@
+# frozen_string_literal: true
+
 require_relative "base_helper"
 require_relative "constants"
 
 class InfoJsonHelper < BaseHelper
-  attr_reader :uuid
-  attr_reader :folder
-  attr_reader :name
-  attr_reader :md5
-  attr_reader :version
+  attr_reader :uuid, :folder, :name, :md5, :version
 
   def initialize(mod_name)
     @filepath = File.join(Constants::DUMP_DIR, mod_name, "info.json")
@@ -21,21 +19,15 @@ class InfoJsonHelper < BaseHelper
     @uuid = data.dig("Mods", 0, "UUID")
     @folder = data.dig("Mods", 0, "Folder")
     @name = data.dig("Mods", 0, "Name")
-    @md5 = data.dig("MD5")
+    @md5 = data["MD5"]
     @version = data.dig("Mods", 0, "Version")
   end
 
   def check_fields!
-    if @uuid.nil?
-      raise "info.json does not have UUID. Cannot proceed."
-    end
+    raise "info.json does not have UUID. Cannot proceed." if @uuid.nil?
 
-    if @folder.nil?
-      raise "info.json does not have Folder. Cannot proceed."
-    end
+    raise "info.json does not have Folder. Cannot proceed." if @folder.nil?
 
-    if @name.nil?
-      raise "info.json does not have Name. Cannot proceed."
-    end
+    raise "info.json does not have Name. Cannot proceed." if @name.nil?
   end
 end

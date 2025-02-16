@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "date"
 
 require_relative "base_helper"
@@ -14,10 +16,10 @@ class ModDataHelper < BaseHelper
   end
 
   def has?(uuid)
-    return self.data.has_key?(uuid)
+    return self.data.key?(uuid)
   end
 
-  def set_installed(uuid, is_installed = true)
+  def set_installed(uuid, is_installed: true)
     self.data[uuid]["is_installed"] = is_installed
   end
 
@@ -30,11 +32,11 @@ class ModDataHelper < BaseHelper
   end
 
   def add_standard_entry(uuid, name)
-    new_number = if self.data.values.size == 0
-        1
-      else
-        self.data.values.map { |mod| mod["number"] }.max + 1
-      end
+    new_number = if self.data.values.empty?
+                   1
+                 else
+                   self.data.values.map { |mod| mod["number"] }.max + 1
+                 end
 
     self.data[uuid] = {
       "is_installed" => true,

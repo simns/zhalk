@@ -1,21 +1,23 @@
+# frozen_string_literal: true
+
 require_relative "base_cmd"
 require_relative "helpers/constants"
 
 class RefreshCmd < BaseCmd
   def help
-    <<-HELP
-Usage:
-  zhalk refresh
+    <<~HELP
+      Usage:
+        zhalk refresh
 
-Description:
-  This reads mods in from the game's modsettings.lsx file. Run this command if you have mods \
-installed with the in-game mod manager, or after you've installed mods with this tool that only \
-consist of a .pak file and thus need to be activated in-game. Mods that are read from \
-modsettings.lsx are saved in this directory's mod-data.json file.
+      Description:
+        This reads mods in from the game's modsettings.lsx file. Run this command if you have mods \
+      installed with the in-game mod manager, or after you've installed mods with this tool that only \
+      consist of a .pak file and thus need to be activated in-game. Mods that are read from \
+      modsettings.lsx are saved in this directory's mod-data.json file.
 
-Options:
-  This command does not have any options.
-HELP
+      Options:
+        This command does not have any options.
+    HELP
   end
 
   def main(args)

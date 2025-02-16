@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pp"
 require "fakefs/spec_helpers"
 require "json"
@@ -37,33 +39,34 @@ RSpec.describe ReorderCmd do
 
       context "when modsettings.lsx has existing mods" do
         before do
-          File.write("modsettings.lsx",
-                     <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Example mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Example mod"/>
-              <attribute id="UUID" type="guid" value="ab941c3d-0827-4833-bbb4-dbb07ac29983"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+          File.write(
+            "modsettings.lsx",
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <save>
+                <version major="4" minor="7" revision="1" build="300"/>
+                <region id="ModuleSettings">
+                  <node id="root">
+                    <children>
+                      <node id="Mods">
+                        <children>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="Example mod"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="Example mod"/>
+                            <attribute id="UUID" type="guid" value="ab941c3d-0827-4833-bbb4-dbb07ac29983"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                        </children>
+                      </node>
+                    </children>
+                  </node>
+                </region>
+              </save>
+            XML
           )
 
-          allow(STDIN).to receive(:gets).and_return("1")
+          allow($stdin).to receive(:gets).and_return("1")
 
           reorder_cmd.run
         end
@@ -71,30 +74,30 @@ XML
         it "stops because no mods were found" do
           expect(File.read("mod-data.json")).to eq("{}")
           expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Example mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Example mod"/>
-              <attribute id="UUID" type="guid" value="ab941c3d-0827-4833-bbb4-dbb07ac29983"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                  )
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <save>
+                <version major="4" minor="7" revision="1" build="300"/>
+                <region id="ModuleSettings">
+                  <node id="root">
+                    <children>
+                      <node id="Mods">
+                        <children>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="Example mod"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="Example mod"/>
+                            <attribute id="UUID" type="guid" value="ab941c3d-0827-4833-bbb4-dbb07ac29983"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                        </children>
+                      </node>
+                    </children>
+                  </node>
+                </region>
+              </save>
+            XML
+          )
         end
       end
     end
@@ -123,34 +126,35 @@ XML
 
       context "when modsettings.lsx has no existing mods" do
         before do
-          File.write("modsettings.lsx",
-                     <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+          File.write(
+            "modsettings.lsx",
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <save>
+                <version major="4" minor="7" revision="1" build="300"/>
+                <region id="ModuleSettings">
+                  <node id="root">
+                    <children>
+                      <node id="Mods">
+                        <children>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="GustavDev"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="GustavDev"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                            <attribute id="Version64" type="int64" value="36028797018963968"/>
+                          </node>
+                        </children>
+                      </node>
+                    </children>
+                  </node>
+                </region>
+              </save>
+            XML
           )
 
-          allow(STDIN).to receive(:gets).and_return("1", "e")
+          allow($stdin).to receive(:gets).and_return("1", "e")
 
           reorder_cmd.run
         end
@@ -174,31 +178,31 @@ XML
 
         it "does not modify modsettings.lsx" do
           expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                  )
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <save>
+                <version major="4" minor="7" revision="1" build="300"/>
+                <region id="ModuleSettings">
+                  <node id="root">
+                    <children>
+                      <node id="Mods">
+                        <children>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="GustavDev"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="GustavDev"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                            <attribute id="Version64" type="int64" value="36028797018963968"/>
+                          </node>
+                        </children>
+                      </node>
+                    </children>
+                  </node>
+                </region>
+              </save>
+            XML
+          )
         end
       end
 
@@ -206,49 +210,49 @@ XML
         context "when the user selects to move a mod after another mod" do
           before do
             File.write("modsettings.lsx",
-                       <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+              <<~XML
+                <?xml version="1.0" encoding="UTF-8"?>
+                <save>
+                  <version major="4" minor="7" revision="1" build="300"/>
+                  <region id="ModuleSettings">
+                    <node id="root">
+                      <children>
+                        <node id="Mods">
+                          <children>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="GustavDev"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="GustavDev"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                              <attribute id="Version64" type="int64" value="36028797018963968"/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="Existing mod"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="Existing mod"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
+                              <attribute id="Version64" type="int64" value=""/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="Existing mod 2"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
+                              <attribute id="Version64" type="int64" value=""/>
+                            </node>
+                          </children>
+                        </node>
+                      </children>
+                    </node>
+                  </region>
+                </save>
+              XML
             )
 
-            allow(STDIN).to receive(:gets).and_return("1", "e")
+            allow($stdin).to receive(:gets).and_return("1", "e")
 
             reorder_cmd.run
           end
@@ -272,96 +276,96 @@ XML
 
           it "modifies modsettings.lsx to reflect new order" do
             expect(File.read("modsettings.lsx")).to eq(
-                                                      <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                    )
+              <<~XML
+                <?xml version="1.0" encoding="UTF-8"?>
+                <save>
+                  <version major="4" minor="7" revision="1" build="300"/>
+                  <region id="ModuleSettings">
+                    <node id="root">
+                      <children>
+                        <node id="Mods">
+                          <children>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="GustavDev"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="GustavDev"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                              <attribute id="Version64" type="int64" value="36028797018963968"/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="Existing mod 2"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
+                              <attribute id="Version64" type="int64" value=""/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="Existing mod"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="Existing mod"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
+                              <attribute id="Version64" type="int64" value=""/>
+                            </node>
+                          </children>
+                        </node>
+                      </children>
+                    </node>
+                  </region>
+                </save>
+              XML
+            )
           end
         end
 
         context "when the user incorrectly selects a mod to move after" do
           before do
             File.write("modsettings.lsx",
-                       <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+              <<~XML
+                <?xml version="1.0" encoding="UTF-8"?>
+                <save>
+                  <version major="4" minor="7" revision="1" build="300"/>
+                  <region id="ModuleSettings">
+                    <node id="root">
+                      <children>
+                        <node id="Mods">
+                          <children>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="GustavDev"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="GustavDev"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                              <attribute id="Version64" type="int64" value="36028797018963968"/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="Existing mod"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="Existing mod"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
+                              <attribute id="Version64" type="int64" value=""/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
+                              <attribute id="MD5" type="LSString" value=""/>
+                              <attribute id="Name" type="LSString" value="Existing mod 2"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
+                              <attribute id="Version64" type="int64" value=""/>
+                            </node>
+                          </children>
+                        </node>
+                      </children>
+                    </node>
+                  </region>
+                </save>
+              XML
             )
 
-            allow(STDIN).to receive(:gets).and_return("1,2", "a 2")
+            allow($stdin).to receive(:gets).and_return("1,2", "a 2")
           end
 
           it "stops before writing any data to the files" do
@@ -378,73 +382,73 @@ XML
       context "when modsettings.lsx has extra mods" do
         before do
           File.write("modsettings.lsx",
-                     <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="An Extra mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="An Extra mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="6700761a-1da5-4902-a3b1-24ddd37254c7"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="An Extra mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="An Extra mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="6c41a621-0855-458f-85bf-1b2d006e9ba1"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="An Extra mod 3"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="An Extra mod 3"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="cb6655bf-a304-4305-84dc-706c9e624040"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <save>
+                <version major="4" minor="7" revision="1" build="300"/>
+                <region id="ModuleSettings">
+                  <node id="root">
+                    <children>
+                      <node id="Mods">
+                        <children>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="GustavDev"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="GustavDev"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                            <attribute id="Version64" type="int64" value="36028797018963968"/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="An Extra mod"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="An Extra mod"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="6700761a-1da5-4902-a3b1-24ddd37254c7"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="Existing mod"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="Existing mod"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="An Extra mod 2"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="An Extra mod 2"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="6c41a621-0855-458f-85bf-1b2d006e9ba1"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="Existing mod 2"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="Existing mod 2"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="An Extra mod 3"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="An Extra mod 3"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="cb6655bf-a304-4305-84dc-706c9e624040"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                        </children>
+                      </node>
+                    </children>
+                  </node>
+                </region>
+              </save>
+            XML
           )
 
-          allow(STDIN).to receive(:gets).and_return("1", "e")
+          allow($stdin).to receive(:gets).and_return("1", "e")
 
           reorder_cmd.run
         end
@@ -468,71 +472,71 @@ XML
 
         it "keeps extra mods at the beginning and found mods at the end in the order specified" do
           expect(File.read("modsettings.lsx")).to eq(
-                                                    <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="An Extra mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="An Extra mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="6700761a-1da5-4902-a3b1-24ddd37254c7"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="An Extra mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="An Extra mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="6c41a621-0855-458f-85bf-1b2d006e9ba1"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="An Extra mod 3"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="An Extra mod 3"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="cb6655bf-a304-4305-84dc-706c9e624040"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod 2"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod 2"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="Existing mod"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                  )
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <save>
+                <version major="4" minor="7" revision="1" build="300"/>
+                <region id="ModuleSettings">
+                  <node id="root">
+                    <children>
+                      <node id="Mods">
+                        <children>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="GustavDev"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="GustavDev"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                            <attribute id="Version64" type="int64" value="36028797018963968"/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="An Extra mod"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="An Extra mod"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="6700761a-1da5-4902-a3b1-24ddd37254c7"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="An Extra mod 2"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="An Extra mod 2"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="6c41a621-0855-458f-85bf-1b2d006e9ba1"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="An Extra mod 3"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="An Extra mod 3"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="cb6655bf-a304-4305-84dc-706c9e624040"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="Existing mod 2"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="Existing mod 2"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                          <node id="ModuleShortDesc">
+                            <attribute id="Folder" type="LSString" value="Existing mod"/>
+                            <attribute id="MD5" type="LSString" value=""/>
+                            <attribute id="Name" type="LSString" value="Existing mod"/>
+                            <attribute id="PublishHandle" type="uint64" value="0"/>
+                            <attribute id="UUID" type="guid" value="c366d5f3-2afc-41d0-b4ac-de15257384e0"/>
+                            <attribute id="Version64" type="int64" value=""/>
+                          </node>
+                        </children>
+                      </node>
+                    </children>
+                  </node>
+                </region>
+              </save>
+            XML
+          )
         end
       end
     end
