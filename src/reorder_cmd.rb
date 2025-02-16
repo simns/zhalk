@@ -1,26 +1,28 @@
+# frozen_string_literal: true
+
 require_relative "base_cmd"
 require_relative "list_cmd"
 require_relative "helpers/constants"
 
 class ReorderCmd < BaseCmd
   def help
-    <<-HELP
-Usage:
-  zhalk reorder
+    <<~HELP
+      Usage:
+        zhalk reorder
 
-Description:
-  This allows mods to be reordered so that dependencies of a mod can be set to load beforehand.
-  Running the command will show the same table used in the 'list' command. From there, note \
-the numbers of the mods you want to move. Input them as a comma-separated list. Then, choose \
-a command in the next prompt, such as placing them at the beginning, end, or after a particular \
-mod.
+      Description:
+        This allows mods to be reordered so that dependencies of a mod can be set to load beforehand.
+        Running the command will show the same table used in the 'list' command. From there, note \
+      the numbers of the mods you want to move. Input them as a comma-separated list. Then, choose \
+      a command in the next prompt, such as placing them at the beginning, end, or after a particular \
+      mod.
 
-Options:
-  This command does not have any options.
-HELP
+      Options:
+        This command does not have any options.
+    HELP
   end
 
-  def main(args)
+  def main(_args)
     @logger.debug("===>> Starting: reorder")
 
     self.check_requirements!
@@ -30,7 +32,7 @@ HELP
     puts table
     @logger.info("Select mods by typing a comma-separated list of numbers.")
 
-    mod_numbers = STDIN.gets.strip
+    mod_numbers = $stdin.gets.strip
     @logger.debug("User input: #{mod_numbers}")
 
     if !self.valid_mod_nums?(mod_numbers)
@@ -42,8 +44,8 @@ HELP
 
     mod_objs = @mod_data_helper.data.values
     selected_mod_names = mod_objs
-      .select { |mod_obj| mod_numbers.include?(mod_obj["number"]) }
-      .map { |mod_obj| mod_obj["mod_name"] }
+                         .select { |mod_obj| mod_numbers.include?(mod_obj["number"]) }
+                         .map { |mod_obj| mod_obj["mod_name"] }
 
     if selected_mod_names.empty?
       @logger.error("No mods with those numbers.")
@@ -57,16 +59,17 @@ HELP
     @logger.info(selected_mod_names.map { |mod_name| "-> #{mod_name}" })
 
     @logger.info("")
-    @logger.info(<<~ACTIONS
-      Choose one of these actions by typing the letter with any arguments:
-       [b] Place at beginning
-       [e] Place at end
-       [a] Place after some [mod number]
-       [c] Cancel
-    ACTIONS
+    @logger.info(
+      <<~ACTIONS
+        Choose one of these actions by typing the letter with any arguments:
+         [b] Place at beginning
+         [e] Place at end
+         [a] Place after some [mod number]
+         [c] Cancel
+      ACTIONS
     )
 
-    command = STDIN.gets.strip
+    command = $stdin.gets.strip
     @logger.debug("User input: #{command}")
 
     existing_mod_objs = mod_objs.sort_by { |mod_obj| mod_obj["number"] }
@@ -94,7 +97,10 @@ HELP
       mod_objs.insert(-1, *mods_to_move)
     when "a"
       if mod_numbers.include?(command_parts[1].to_i)
-        @logger.error("The mod you're placing the others after cannot be part of the moving set. Please choose another.")
+        @logger.error(
+          "The mod you're placing the others after cannot be part of the moving set. \
+          Please choose another."
+        )
         return
       end
       return if !self.put_after_mod(command_parts[1], mods_to_move, mod_objs)

@@ -1,10 +1,10 @@
+# frozen_string_literal: true
+
 require_relative "base_helper"
 
 class ModsettingsHelper < BaseHelper
   def initialize(config_helper, logger)
-    if config_helper.nil?
-      raise ArgumentError, "ModsettingsHelper must accept a valid ConfigHelper."
-    end
+    raise ArgumentError, "ModsettingsHelper must accept a valid ConfigHelper." if config_helper.nil?
 
     @config_helper = config_helper
     @logger = logger

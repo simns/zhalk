@@ -1,24 +1,26 @@
+# frozen_string_literal: true
+
 require_relative "base_cmd"
 require_relative "helpers/constants"
 
 class DeactivateCmd < BaseCmd
   def help
-    <<-HELP
-Usage:
-  zhalk deactivate [MOD_NUMBER]
+    <<~HELP
+      Usage:
+        zhalk deactivate [MOD_NUMBER]
 
-Description:
-  This sets a mod as inactive, which removes its entry from the game's modsettings.lsx file. This will \
-not delete the mod files. Specify the mod with the associated mod number. You can see the numbers \
-with the 'list' command.
-  Mod can be easily reactivated with the 'activate' command.
+      Description:
+        This sets a mod as inactive, which removes its entry from the game's modsettings.lsx file. This will \
+      not delete the mod files. Specify the mod with the associated mod number. You can see the numbers \
+      with the 'list' command.
+        Mod can be easily reactivated with the 'activate' command.
 
-Options:
-  This command does not have any options.
+      Options:
+        This command does not have any options.
 
-Aliases:
-  disable
-HELP
+      Aliases:
+        disable
+    HELP
   end
 
   def main(args)
@@ -32,7 +34,9 @@ HELP
     end
 
     target_mod_number = args[0].to_i
-    target_mod = @mod_data_helper.data.values.detect { |mod_obj| mod_obj["number"] == target_mod_number }
+    target_mod = @mod_data_helper.data.values.detect do |mod_obj|
+      mod_obj["number"] == target_mod_number
+    end
 
     if target_mod.nil?
       @logger.error("Could not find a mod with number: #{target_mod_number}.")
@@ -79,7 +83,7 @@ HELP
   end
 
   def update_mod_data(target_uuid)
-    @mod_data_helper.set_installed(target_uuid, false)
+    @mod_data_helper.set_installed(target_uuid, is_installed: false)
 
     @mod_data_helper.save(log_level: :info)
   end

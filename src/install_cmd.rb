@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "zip"
 require "nokogiri"
 
@@ -7,21 +9,21 @@ require_relative "helpers/constants"
 
 class InstallCmd < BaseCmd
   def help
-    <<-HELP
-Usage:
-  zhalk install [options]
+    <<~HELP
+      Usage:
+        zhalk install [options]
 
-Description:
-  This installs mods that are located in the mods/ directory. Each mod must be a .zip file. Mods \
-that are already installed will be skipped.
+      Description:
+        This installs mods that are located in the mods/ directory. Each mod must be a .zip file. Mods \
+      that are already installed will be skipped.
 
-Options:
-  --dry-run     Don't install anything. Only list what would be installed.
-  --update      Update all mods by reprocessing zip files in 'mods' folder. Same as 'update' command.
+      Options:
+        --dry-run     Don't install anything. Only list what would be installed.
+        --update      Update all mods by reprocessing zip files in 'mods' folder. Same as 'update' command.
 
-Aliases:
-  in, i
-HELP
+      Aliases:
+        in, i
+    HELP
   end
 
   def process_args(args)
@@ -65,11 +67,11 @@ HELP
         if mod_data_entry && !@is_update
           if mod_data_entry["is_installed"]
             @logger.info("Mod is marked as installed. Skipping.")
-            next
           else
             @logger.info("Mod is marked as inactive. Skipping.")
-            next
           end
+
+          next
         end
 
         if !@is_update
@@ -131,13 +133,13 @@ HELP
     end
 
     builder = Nokogiri::XML::Builder.with(modsettings.at("node#Mods children")) do |xml|
-      xml.node.ModuleShortDesc! {
+      xml.node.ModuleShortDesc! do
         xml.attribute.Folder!(type: "LSString", value: info_json_helper.folder)
         xml.attribute.MD5!(type: "LSString", value: info_json_helper.md5)
         xml.attribute.Name!(type: "LSString", value: info_json_helper.name)
         xml.attribute.UUID!(type: "guid", value: info_json_helper.uuid)
         xml.attribute.Version64!(type: "int64", value: info_json_helper.version)
-      }
+      end
     end
 
     @modsettings_helper.save(builder, log_level: :info)
@@ -210,7 +212,7 @@ HELP
   def print_install_report(installed_mods)
     @logger.info("")
 
-    if installed_mods.size == 0
+    if installed_mods.empty?
       @logger.info("Nothing to do.")
     else
       standard_mods = installed_mods.select { |mod| mod[:type] == :standard }
@@ -220,7 +222,9 @@ HELP
 
       @logger.info("===== INSTALL REPORT =====")
       @logger.info("You #{action_text} #{self.num_mods(standard_mods.size, "standard")}.")
-      @logger.info(standard_mods.map { |mod| "-> #{mod[:name]} #{mod[:is_inactive] ? "(inactive)" : ""}" })
+      @logger.info(standard_mods.map do |mod|
+        "-> #{mod[:name]} #{mod[:is_inactive] ? "(inactive)" : ""}"
+      end)
       if !@is_update && standard_mods.size >= 1
         @logger.info("Nothing left to do for these.")
       end

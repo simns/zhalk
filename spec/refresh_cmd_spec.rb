@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pp"
 require "fakefs/spec_helpers"
 require "json"
@@ -34,22 +36,22 @@ RSpec.describe RefreshCmd do
       before do
         File.write("mod-data.json", "{}")
         File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
 
         refresh_cmd.run
@@ -75,31 +77,32 @@ XML
     context "when there are mods in the modsettings file" do
       before do
         File.write("mod-data.json", "{}")
-        File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Mod to refresh"/>
-              <attribute id="MD5" type="LSString" value="37f141617cf2f6303442a5ef27a78ecc"/>
-              <attribute id="Name" type="LSString" value="Mod to refresh"/>
-              <attribute id="PublishHandle" type="uint64" value=""/>
-              <attribute id="UUID" type="guid" value="02a0bea9-a631-4c45-9ffe-5876bb133967"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+        File.write(
+          "modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Mod to refresh"/>
+                          <attribute id="MD5" type="LSString" value="37f141617cf2f6303442a5ef27a78ecc"/>
+                          <attribute id="Name" type="LSString" value="Mod to refresh"/>
+                          <attribute id="PublishHandle" type="uint64" value=""/>
+                          <attribute id="UUID" type="guid" value="02a0bea9-a631-4c45-9ffe-5876bb133967"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
 
         refresh_cmd.run
@@ -131,31 +134,32 @@ XML
             "updated_at" => Time.now.to_s
           }
         }.to_json)
-        File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Existing mod"/>
-              <attribute id="MD5" type="LSString" value="3112eaf64d4fabdc282b079e8fe06fdc"/>
-              <attribute id="Name" type="LSString" value="Existing mod"/>
-              <attribute id="PublishHandle" type="uint64" value=""/>
-              <attribute id="UUID" type="guid" value="1a5432e9-7821-4ef7-a66f-8cf3a11d45f9"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+        File.write(
+          "modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Existing mod"/>
+                          <attribute id="MD5" type="LSString" value="3112eaf64d4fabdc282b079e8fe06fdc"/>
+                          <attribute id="Name" type="LSString" value="Existing mod"/>
+                          <attribute id="PublishHandle" type="uint64" value=""/>
+                          <attribute id="UUID" type="guid" value="1a5432e9-7821-4ef7-a66f-8cf3a11d45f9"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
 
         refresh_cmd.run

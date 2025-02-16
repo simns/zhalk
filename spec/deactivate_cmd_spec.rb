@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pp"
 require "fakefs/spec_helpers"
 require "json"
@@ -44,38 +46,39 @@ RSpec.describe DeactivateCmd do
             "updated_at" => Time.now.to_s
           }
         }.to_json)
-        File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="Test Folder"/>
-              <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
-              <attribute id="Name" type="LSString" value="Test Mod"/>
-              <attribute id="UUID" type="guid" value="e7714436-06aa-483f-bafc-8f1690422968"/>
-              <attribute id="Version64" type="int64" value=""/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+        File.write(
+          "modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Test Folder"/>
+                          <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
+                          <attribute id="Name" type="LSString" value="Test Mod"/>
+                          <attribute id="UUID" type="guid" value="e7714436-06aa-483f-bafc-8f1690422968"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
 
         deactivate_cmd.run("1")
@@ -83,45 +86,46 @@ XML
 
       it "removes the mod from modsettings" do
         expect(File.read("modsettings.lsx")).to eq(
-                                                  <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                )
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
       end
 
       it "adds the mod entry to a file in 'inactive' folder" do
-        expect(File.read(File.join(Constants::INACTIVE_DIR, "e7714436-06aa-483f-bafc-8f1690422968.xml"))).to eq(
-                                                                                                               <<-XML.strip
-<node id="ModuleShortDesc">
-  <attribute id="Folder" type="LSString" value="Test Folder"/>
-  <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
-  <attribute id="Name" type="LSString" value="Test Mod"/>
-  <attribute id="UUID" type="guid" value="e7714436-06aa-483f-bafc-8f1690422968"/>
-  <attribute id="Version64" type="int64" value=""/>
-</node>
-XML
-                                                                                                             )
+        expect(File.read(File.join(Constants::INACTIVE_DIR,
+          "e7714436-06aa-483f-bafc-8f1690422968.xml"))).to eq(
+            <<~XML.strip
+              <node id="ModuleShortDesc">
+                <attribute id="Folder" type="LSString" value="Test Folder"/>
+                <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
+                <attribute id="Name" type="LSString" value="Test Mod"/>
+                <attribute id="UUID" type="guid" value="e7714436-06aa-483f-bafc-8f1690422968"/>
+                <attribute id="Version64" type="int64" value=""/>
+              </node>
+            XML
+          )
       end
 
       it "sets the mod as not installed in mod-data.json" do
@@ -149,35 +153,37 @@ XML
           }
         }.to_json)
         File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
       end
 
       it "raises an error before any backup is performed" do
-        expect(logger).to receive(:error).with("Could not find mod entry in modsettings.lsx. Cannot proceed.")
+        expect(logger).to receive(:error).with(
+          "Could not find mod entry in modsettings.lsx. Cannot proceed."
+        )
 
         deactivate_cmd.run("1")
 
@@ -191,33 +197,34 @@ XML
         })
 
         expect(File.read("modsettings.lsx")).to eq(
-                                                  <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                )
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
 
-        expect(File.exist?(File.join(Constants::INACTIVE_DIR, "bd75eb6e-6998-48ef-836a-72c38ad08e9b.xml"))).to be(false)
+        expect(File.exist?(File.join(Constants::INACTIVE_DIR,
+          "bd75eb6e-6998-48ef-836a-72c38ad08e9b.xml"))).to be(false)
       end
     end
 
@@ -225,30 +232,30 @@ XML
       before do
         File.write("mod-data.json", "{}")
         File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
       end
 
@@ -263,31 +270,31 @@ XML
 
         expect(File.read("mod-data.json")).to eq("{}")
         expect(File.read("modsettings.lsx")).to eq(
-                                                  <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                )
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
       end
     end
 
@@ -304,30 +311,30 @@ XML
           }
         }.to_json)
         File.write("modsettings.lsx",
-                   <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
         )
       end
 
@@ -350,31 +357,31 @@ XML
         })
 
         expect(File.read("modsettings.lsx")).to eq(
-                                                  <<-XML
-<?xml version="1.0" encoding="UTF-8"?>
-<save>
-  <version major="4" minor="7" revision="1" build="300"/>
-  <region id="ModuleSettings">
-    <node id="root">
-      <children>
-        <node id="Mods">
-          <children>
-            <node id="ModuleShortDesc">
-              <attribute id="Folder" type="LSString" value="GustavDev"/>
-              <attribute id="MD5" type="LSString" value=""/>
-              <attribute id="Name" type="LSString" value="GustavDev"/>
-              <attribute id="PublishHandle" type="uint64" value="0"/>
-              <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
-              <attribute id="Version64" type="int64" value="36028797018963968"/>
-            </node>
-          </children>
-        </node>
-      </children>
-    </node>
-  </region>
-</save>
-XML
-                                                )
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
       end
     end
   end

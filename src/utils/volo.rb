@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "logger"
 require "rainbow"
 
@@ -40,22 +42,20 @@ class Volo < Logger
   def handle_log(msg, level, color = nil)
     lines = msg
     if msg.is_a? String
-      if msg == ""
-        lines = [""]
-      else
-        lines = msg.split("\n")
-      end
+      lines = if msg == ""
+                [""]
+              else
+                msg.split("\n")
+              end
     end
 
-    if lines.is_a? Array
-      lines.each { |line| self.add(LOG_LEVEL_MAP[level], line) }
-    else
-      raise ArgumentError, "Invalid msg for #handle_log."
-    end
+    raise ArgumentError, "Invalid msg for #handle_log." unless lines.is_a? Array
 
-    if self.log_level_matches?(level)
-      self.handle_puts(lines, level, color)
-    end
+    lines.each { |line| self.add(LOG_LEVEL_MAP[level], line) }
+
+    return if !self.log_level_matches?(level)
+
+    self.handle_puts(lines, level, color)
   end
 
   private

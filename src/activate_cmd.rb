@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "nokogiri"
 
 require_relative "base_cmd"
@@ -12,20 +14,20 @@ class ActivateCmd < BaseCmd
   end
 
   def help
-    <<-HELP
-Usage:
-  zhalk activate [MOD_NUMBER]
+    <<~HELP
+      Usage:
+        zhalk activate [MOD_NUMBER]
 
-Description:
-  This sets a deactivated mod back to active. It adds the mod entry back into modsettings.lsx. \
-Specify the mod with the associated mod number. You can see the numbers with the 'list' command.
+      Description:
+        This sets a deactivated mod back to active. It adds the mod entry back into modsettings.lsx. \
+      Specify the mod with the associated mod number. You can see the numbers with the 'list' command.
 
-Options:
-  This command does not have any options.
+      Options:
+        This command does not have any options.
 
-Aliases:
-  enable
-HELP
+      Aliases:
+        enable
+    HELP
   end
 
   def main(args)
@@ -39,7 +41,9 @@ HELP
     end
 
     target_mod_number = args[0].to_i
-    target_mod = @mod_data_helper.data.values.detect { |mod_obj| mod_obj["number"] == target_mod_number }
+    target_mod = @mod_data_helper.data.values.detect do |mod_obj|
+      mod_obj["number"] == target_mod_number
+    end
 
     if target_mod.nil?
       @logger.error("Could not find a mod with number: #{target_mod_number}.")
@@ -65,9 +69,7 @@ HELP
 
   def load_inactive_into_modsettings(target_uuid)
     inactive_mod_filepath = File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml")
-    if !File.exist?(inactive_mod_filepath)
-      raise "Could not find inactive mod's backup xml file."
-    end
+    raise "Could not find inactive mod's backup xml file." if !File.exist?(inactive_mod_filepath)
 
     inactive_mod_doc = @base_helper.get_xml_data(inactive_mod_filepath)
     inactive_entry = inactive_mod_doc.at_css("node#ModuleShortDesc")
@@ -75,9 +77,7 @@ HELP
     @logger.debug("Loaded in #{target_uuid}.xml:")
     @logger.debug(inactive_mod_doc.to_xml)
 
-    if inactive_entry.nil?
-      raise "Could not find inactive mod entry in the backup file."
-    end
+    raise "Could not find inactive mod entry in the backup file." if inactive_entry.nil?
 
     mods = @modsettings_helper.data.css("node#Mods node")
     mods << inactive_entry
@@ -106,7 +106,7 @@ HELP
     @mod_data_helper.save(log_level: :info)
   end
 
-  def delete_inactive_backup(target_uuid)
+  def delete_inactive_backup(_target_uuid)
     # TODO: Implement
     @logger.info("Backup file will not be deleted for now. Feel free to delete it manually.")
   end
