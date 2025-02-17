@@ -24,10 +24,9 @@ class HelpCmd
           --help        Show help for a specific command.
 
         install:
-          --dry-run     Simulate installation without making changes.
+          --update      Update all mods by reprocessing zip files in 'mods' folder. Same as 'update' command.
 
         list:
-          --all         Show all mods (default).
           --active      Show only active mods.
           --inactive    Show only inactive mods.
 

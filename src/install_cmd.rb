@@ -18,7 +18,6 @@ class InstallCmd < BaseCmd
       that are already installed will be skipped.
 
       Options:
-        --dry-run     Don't install anything. Only list what would be installed.
         --update      Update all mods by reprocessing zip files in 'mods' folder. Same as 'update' command.
 
       Aliases:
