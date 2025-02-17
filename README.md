@@ -52,7 +52,7 @@ Zhalk uses a few files and folders to manage the mods. Initialize them with this
 ./zhalk init
 ```
 
-Edit the configuration file: `conf.toml` with your Baldur's Gate 3 AppData directory.
+Edit the configuration file: `conf.toml` and input your Baldur's Gate 3 AppData directory.
 
 Next, move your mods as `.zip` files into this project's `mods` folder. Then install them with:
 
