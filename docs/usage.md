@@ -75,3 +75,21 @@ The reorder command does not accept any options because it starts an interactive
 Then, you select an action for those, such as placing them at the beginning of the list, at the end, or after a particular mod.
 You can do this for deactivated mods too.
 Whenever those mods are activated again, they will be placed in their proper order.
+
+### Activate / Deactivate
+
+```
+Usage:
+  zhalk activate
+
+  zhalk deactivate
+```
+
+Deactivating or disabling a mod makes it not load into the game.
+Conversely, activating or enabling a mod restores it into the game.
+Mostly, this involves removing or inserting the mod's entry into the `modsettings.lsx` file.
+
+What this doesn't do is delete the `.pak` files or the `.zip` files in the tool's `mods` folder.
+
+Note, there is no command to "uninstall" or delete mods.
+This is because the `.pak` files can safely sit in the game's folders and not affect anything as long as the `modsettings.lsx` file is updated correctly.
