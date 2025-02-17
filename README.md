@@ -52,7 +52,7 @@ Zhalk uses a few files and folders to manage the mods. Initialize them with this
 ./zhalk init
 ```
 
-Edit the configuration file: `conf.toml` with your Baldur's Gate 3 AppData directory.
+Edit the configuration file: `conf.toml` and input your Baldur's Gate 3 AppData directory.
 
 Next, move your mods as `.zip` files into this project's `mods` folder. Then install them with:
 
@@ -78,8 +78,15 @@ That's the basic usage!
 
 If you want more info on the rest of the commands, see [this doc](/docs/usage.md).
 
-Alternatively, you can run `./zhalk --help` to get help.
+You can also run `./zhalk --help` to see how to use the tool.
 
 ### FAQ
 
 See [this FAQ doc](/docs/faq.md).
+
+### Coffee
+
+If you like this tool, consider buying me a coffee ☕.
+Otherwise, happy gaming!
+
+<a href="https://www.buymeacoffee.com/simns" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-green.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
