@@ -3,6 +3,7 @@
 require "date"
 
 require_relative "base_helper"
+require_relative "../../root"
 
 class ModDataHelper < BaseHelper
   def initialize(logger)
@@ -10,11 +11,12 @@ class ModDataHelper < BaseHelper
   end
 
   def data
-    if !File.exist?("mod-data.json")
+    puts "moddaata fetching #{File.join(ROOT_DIR, "mod-data.json")}"
+    if !File.exist?(File.join(ROOT_DIR, "mod-data.json"))
       raise "mod-data.json does not exist. Make sure to run the 'init' command."
     end
 
-    @data ||= self.get_json_data("mod-data.json")
+    @data ||= self.get_json_data(File.join(ROOT_DIR, "mod-data.json"))
 
     return @data
   end

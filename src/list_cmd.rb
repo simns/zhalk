@@ -4,6 +4,7 @@ require "terminal-table"
 require "date"
 
 require_relative "base_cmd"
+require_relative "../root"
 
 class ListCmd < BaseCmd
   MOD_TYPE_MAP = {
