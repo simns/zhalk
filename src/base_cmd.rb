@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require "fileutils"
+require "rainbow"
 
 require_relative "helpers/config_helper"
 require_relative "helpers/mod_data_helper"
 require_relative "helpers/modsettings_helper"
 require_relative "helpers/constants"
+require_relative "utils/errors"
 require_relative "utils/volo"
 
 class BaseCmd
@@ -23,6 +25,8 @@ class BaseCmd
     else
       self.main(args)
     end
+  rescue ConfigNotFoundError => error
+    puts Rainbow(error.detailed_message).red
   rescue StandardError => error
     @logger.error(error.message)
     @logger.debug(error.backtrace)
@@ -81,18 +85,5 @@ class BaseCmd
 
   def num?(num)
     return num.to_i.to_s == num.strip
-  end
-
-  private
-
-  def check_requirements!
-    if !File.exist?("mod-data.json")
-      raise "mod-data.json does not exist. Make sure to run the 'init' command."
-    end
-    if !File.exist?("conf.toml")
-      raise "No conf.toml found. Make sure to run the 'init' command."
-    end
-
-    @logger.debug("Finished #check_requirements!")
   end
 end

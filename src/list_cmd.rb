@@ -45,8 +45,6 @@ class ListCmd < BaseCmd
   def main(args)
     @logger.debug("===>> Starting: list")
 
-    self.check_requirements!
-
     self.process_args(args)
 
     if @mod_data_helper.data.keys.empty?

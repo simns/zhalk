@@ -10,6 +10,10 @@ class ModDataHelper < BaseHelper
   end
 
   def data
+    if !File.exist?("mod-data.json")
+      raise "mod-data.json does not exist. Make sure to run the 'init' command."
+    end
+
     @data ||= self.get_json_data("mod-data.json")
 
     return @data

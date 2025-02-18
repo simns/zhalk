@@ -25,8 +25,6 @@ class ReorderCmd < BaseCmd
   def main(_args)
     @logger.debug("===>> Starting: reorder")
 
-    self.check_requirements!
-
     table = ListCmd.new.construct_mod_table
 
     puts table

@@ -23,8 +23,6 @@ class RefreshCmd < BaseCmd
   def main(_args)
     @logger.debug("===>> Starting: refresh")
 
-    self.check_requirements!
-
     @logger.info("Reading from modsettings.lsx...")
 
     starting_number = (@mod_data_helper.data.values.map { |mod| mod["number"] }.max || 0) + 1

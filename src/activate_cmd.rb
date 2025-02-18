@@ -33,8 +33,6 @@ class ActivateCmd < BaseCmd
   def main(args)
     @logger.debug("===>> Starting: activate")
 
-    self.check_requirements!
-
     if args[0].nil? || !self.num?(args[0])
       @logger.error("Invalid arg. Please pass a number corresponding to the mod.")
       return

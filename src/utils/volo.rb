@@ -19,8 +19,13 @@ class Volo < Logger
 
     super(File.join(Constants::LOGS_DIR, "zhalk.log"), "daily")
 
-    config_helper = ConfigHelper.new
-    @config = config_helper.data["logging"]
+    @config_helper = ConfigHelper.new
+  end
+
+  def config
+    @config ||= @config_helper.data["logging"]
+
+    return @config
   end
 
   def info(msg, color = nil)
@@ -61,14 +66,14 @@ class Volo < Logger
   private
 
   def log_level_matches?(level)
-    config_level = @config["log_level"].to_sym
+    config_level = self.config["log_level"].to_sym
     levels = LOG_LEVEL_MAP.keys
 
     return levels.index(level) >= levels.index(config_level)
   end
 
   def handle_puts(lines, level, color)
-    if level == :warn || level == :error || @config["log_level_in_stdout"]
+    if level == :warn || level == :error || self.config["log_level_in_stdout"]
       lines = lines.map { |line| "#{level.to_s.upcase}: #{line}" }
     end
 

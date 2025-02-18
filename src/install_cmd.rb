@@ -37,8 +37,6 @@ class InstallCmd < BaseCmd
   def main(args)
     @logger.debug("===>> Starting: install")
 
-    self.check_requirements!
-
     self.process_args(args)
 
     self.make_modsettings_backup

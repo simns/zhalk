@@ -24,8 +24,6 @@ class UpdateCmd < BaseCmd
   end
 
   def main(args)
-    self.check_requirements!
-
     InstallCmd.new.run("--update", *args)
   end
 end
