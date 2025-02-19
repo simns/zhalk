@@ -25,13 +25,17 @@ class InitCmd < BaseCmd
   def main(_args)
     @logger.debug("===>> Starting: init")
 
-    self.safe_mkdir(Constants::MODS_DIR, log_level: :info)
-    self.safe_mkdir(Constants::DUMP_DIR, log_level: :info)
-    self.safe_mkdir(Constants::INACTIVE_DIR, log_level: :info)
+    self.safe_mkdir(Filepaths.root(Constants::MODS_DIR), log_level: :info)
+    self.safe_mkdir(Filepaths.root(Constants::DUMP_DIR), log_level: :info)
+    self.safe_mkdir(Filepaths.root(Constants::INACTIVE_DIR), log_level: :info)
 
-    self.safe_cp("conf.toml.template", "conf.toml", log_level: :info)
+    self.safe_cp(
+      Filepaths.root("conf.toml.template"),
+      Filepaths.root("conf.toml"),
+      log_level: :info
+    )
 
-    self.safe_create("mod-data.json", content: "{}", log_level: :info)
+    self.safe_create(Filepaths.root("mod-data.json"), content: "{}", log_level: :info)
 
     @logger.info("Done.")
   end

@@ -11,6 +11,8 @@ require_relative "src/update_cmd"
 require_relative "src/deactivate_cmd"
 require_relative "src/activate_cmd"
 
+ROOT_DIR = __dir__
+
 command = ARGV[0]
 options = ARGV[1..]
 

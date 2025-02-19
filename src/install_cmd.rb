@@ -6,6 +6,7 @@ require "nokogiri"
 require_relative "base_cmd"
 require_relative "helpers/info_json_helper"
 require_relative "helpers/constants"
+require_relative "utils/filepaths"
 
 class InstallCmd < BaseCmd
   def help
@@ -43,7 +44,7 @@ class InstallCmd < BaseCmd
 
     installed_mods = []
 
-    Dir.glob(File.join(Constants::MODS_DIR, "*.zip")).each do |zip_file_name|
+    Dir.glob(Filepaths.mods("*.zip")).each do |zip_file_name|
       mod_name = File.basename(zip_file_name).sub(/\.zip\z/, "")
 
       @logger.info("==== Processing #{mod_name} ====")
@@ -100,18 +101,18 @@ class InstallCmd < BaseCmd
   end
 
   def extract_mod_files(zip_file_name, mod_name)
-    if File.exist?(File.join(Constants::DUMP_DIR, mod_name)) && !@is_update
+    if File.exist?(Filepaths.dump(mod_name)) && !@is_update
       @logger.info("Zip file already extracted. Skipping.")
       return
     end
 
-    self.safe_mkdir(File.join(Constants::DUMP_DIR, mod_name))
+    self.safe_mkdir(Filepaths.dump(mod_name))
 
     @logger.info("Extracting...")
 
     Zip::File.open(zip_file_name) do |zip_file|
       zip_file.each do |entry|
-        filepath = File.join(Constants::DUMP_DIR, mod_name, entry.name)
+        filepath = Filepaths.dump(mod_name, entry.name)
         zip_file.extract(entry, filepath) { true }
       end
     end
@@ -185,7 +186,7 @@ class InstallCmd < BaseCmd
 
   def copy_pak_files(mod_name)
     did_copy = false
-    Dir.glob(File.join(Constants::DUMP_DIR, mod_name, "*.pak")).each do |pak_file|
+    Dir.glob(Filepaths.dump(mod_name, "*.pak")).each do |pak_file|
       if @is_update
         FileUtils.cp(
           pak_file,
