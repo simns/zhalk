@@ -16,6 +16,8 @@ RSpec.describe RefreshCmd do
   let(:logger) { spy }
 
   before do
+    stub_const("ROOT_DIR", ".")
+
     File.write("mod-data.json", "{}")
     File.write("conf.toml", "")
 

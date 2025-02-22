@@ -13,6 +13,8 @@ RSpec.describe InitCmd do
     let(:init_cmd) { InitCmd.new }
 
     before do
+      stub_const("ROOT_DIR", ".")
+
       allow(Volo).to receive(:new).and_return(spy)
 
       FileUtils.touch("conf.toml.template")
