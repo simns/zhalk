@@ -24,6 +24,8 @@ class UpdateCmd < BaseCmd
   end
 
   def main(args)
+    @logger.debug("===>> Starting: update")
+
     InstallCmd.new.run("--update", *args)
   end
 end
