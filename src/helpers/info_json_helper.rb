@@ -2,12 +2,13 @@
 
 require_relative "base_helper"
 require_relative "constants"
+require_relative "../utils/filepaths"
 
 class InfoJsonHelper < BaseHelper
   attr_reader :uuid, :folder, :name, :md5, :version
 
   def initialize(mod_name)
-    @filepath = File.join(Constants::DUMP_DIR, mod_name, "info.json")
+    @filepath = Filepaths.dump(mod_name, "info.json")
   end
 
   def file_present?

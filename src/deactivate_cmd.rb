@@ -2,6 +2,7 @@
 
 require_relative "base_cmd"
 require_relative "helpers/constants"
+require_relative "utils/filepaths"
 
 class DeactivateCmd < BaseCmd
   def help
@@ -67,7 +68,7 @@ class DeactivateCmd < BaseCmd
     mod_entry = uuid_attribute.parent
 
     File.write(
-      File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml"),
+      Filepaths.inactive("#{target_uuid}.xml"),
       mod_entry.to_xml
     )
 

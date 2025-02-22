@@ -3,6 +3,7 @@
 require "date"
 
 require_relative "base_helper"
+require_relative "../utils/filepaths"
 
 class ModDataHelper < BaseHelper
   def initialize(logger)
@@ -10,11 +11,11 @@ class ModDataHelper < BaseHelper
   end
 
   def data
-    if !File.exist?("mod-data.json")
+    if !File.exist?(Filepaths.root("mod-data.json"))
       raise "mod-data.json does not exist. Make sure to run the 'init' command."
     end
 
-    @data ||= self.get_json_data("mod-data.json")
+    @data ||= self.get_json_data(Filepaths.root("mod-data.json"))
 
     return @data
   end
@@ -68,7 +69,7 @@ class ModDataHelper < BaseHelper
   def save(log_level: :debug)
     return if self.data.nil?
 
-    self.save_json_data("mod-data.json", self.data)
+    self.save_json_data(Filepaths.root("mod-data.json"), self.data)
 
     @logger.handle_log("Wrote data to mod-data.json.", log_level)
   end

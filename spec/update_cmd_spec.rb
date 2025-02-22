@@ -19,6 +19,8 @@ RSpec.describe UpdateCmd do
   let(:logger) { spy }
 
   before do
+    stub_const("ROOT_DIR", ".")
+
     allow(Volo).to receive(:new).and_return(logger)
   end
 

@@ -5,6 +5,7 @@ require "rainbow"
 
 require_relative "../helpers/config_helper"
 require_relative "../helpers/constants"
+require_relative "filepaths"
 
 class Volo < Logger
   LOG_LEVEL_MAP = {
@@ -15,9 +16,9 @@ class Volo < Logger
   }.freeze
 
   def initialize
-    FileUtils.mkdir_p(Constants::LOGS_DIR)
+    FileUtils.mkdir_p(Filepaths.root(Constants::LOGS_DIR))
 
-    super(File.join(Constants::LOGS_DIR, "zhalk.log"), "daily")
+    super(Filepaths.root(Constants::LOGS_DIR, "zhalk.log"), "daily")
 
     @config_helper = ConfigHelper.new
   end
@@ -58,9 +59,9 @@ class Volo < Logger
 
     lines.each { |line| self.add(LOG_LEVEL_MAP[level], line) }
 
-    return if !self.log_level_matches?(level)
-
-    self.handle_puts(lines, level, color)
+    if self.log_level_matches?(level)
+      self.handle_puts(lines, level, color)
+    end
   end
 
   private

@@ -5,6 +5,7 @@ require "nokogiri"
 require_relative "base_cmd"
 require_relative "helpers/base_helper"
 require_relative "helpers/constants"
+require_relative "utils/filepaths"
 
 class ActivateCmd < BaseCmd
   def initialize
@@ -66,7 +67,7 @@ class ActivateCmd < BaseCmd
   end
 
   def load_inactive_into_modsettings(target_uuid)
-    inactive_mod_filepath = File.join(Constants::INACTIVE_DIR, "#{target_uuid}.xml")
+    inactive_mod_filepath = Filepaths.inactive("#{target_uuid}.xml")
     raise "Could not find inactive mod's backup xml file." if !File.exist?(inactive_mod_filepath)
 
     inactive_mod_doc = @base_helper.get_xml_data(inactive_mod_filepath)

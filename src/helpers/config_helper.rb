@@ -7,7 +7,7 @@ require_relative "../utils/errors"
 
 class ConfigHelper < BaseHelper
   def data
-    if !File.exist?("conf.toml")
+    if !File.exist?(File.join(ROOT_DIR, "conf.toml"))
       raise ConfigNotFoundError, "No conf.toml found. Make sure to run the 'init' command."
     end
 
@@ -19,6 +19,6 @@ class ConfigHelper < BaseHelper
   private
 
   def toml_config
-    TOML.load_file("conf.toml")
+    TOML.load_file(File.join(ROOT_DIR, "conf.toml"))
   end
 end

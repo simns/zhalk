@@ -41,13 +41,11 @@ class BaseCmd
   end
 
   def safe_mkdir(name, log_level: :debug)
-    @logger.debug("Starting safe_mkdir for #{name}")
-
     if !Dir.exist?(name)
       Dir.mkdir(name)
-      @logger.handle_log("Created dir \"#{name}\".", log_level)
+      @logger.handle_log("Created dir \"#{File.basename(name)}\".", log_level)
     else
-      @logger.handle_log("Dir \"#{name}\" already exists.", log_level)
+      @logger.handle_log("Dir \"#{File.basename(name)}\" already exists.", log_level)
     end
   end
 
@@ -60,10 +58,10 @@ class BaseCmd
 
     if !File.exist?(updated_dest)
       FileUtils.cp(src, updated_dest)
-      @logger.handle_log("Created file #{File.basename(updated_dest)}.", log_level)
+      @logger.handle_log("Created file \"#{File.basename(updated_dest)}\".", log_level)
       return true
     else
-      @logger.handle_log("File #{File.basename(updated_dest)} already exists.", log_level)
+      @logger.handle_log("File \"#{File.basename(updated_dest)}\" already exists.", log_level)
       return false
     end
   end
@@ -71,9 +69,9 @@ class BaseCmd
   def safe_create(filename, content: "", log_level: :debug)
     if !File.exist?(filename)
       File.write(filename, content)
-      @logger.handle_log("Created file #{filename}.", log_level)
+      @logger.handle_log("Created file \"#{File.basename(filename)}\".", log_level)
     else
-      @logger.handle_log("File #{filename} already exists.", log_level)
+      @logger.handle_log("File \"#{File.basename(filename)}\" already exists.", log_level)
     end
   end
 
