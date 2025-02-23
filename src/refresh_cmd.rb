@@ -10,10 +10,11 @@ class RefreshCmd < BaseCmd
         zhalk refresh
 
       Description:
-        This reads mods in from the game's modsettings.lsx file. Run this command if you have mods \
-      installed with the in-game mod manager, or after you've installed mods with this tool that only \
-      consist of a .pak file and thus need to be activated in-game. Mods that are read from \
-      modsettings.lsx are saved in this directory's mod-data.json file.
+        This reads mods in from the game's modsettings.lsx file, and checks if any mods were \
+      disabled through the in-game mod manager. Run this command if you've made any changes in \
+      the in-game mod manager, or you've installed mods through Zhalk that only consist of a \
+      .pak file, and then enabled them in-game. Mods that are read from modsettings.lsx are saved \
+      in this directory's mod-data.json file.
 
       Options:
         This command does not have any options.
@@ -23,6 +24,12 @@ class RefreshCmd < BaseCmd
   def main(_args)
     @logger.debug("===>> Starting: refresh")
 
+    self.load_mods_from_modsettings
+
+    self.update_disabled_mods
+  end
+
+  def load_mods_from_modsettings
     @logger.info("Reading from modsettings.lsx...")
 
     starting_number = (@mod_data_helper.data.values.map { |mod| mod["number"] }.max || 0) + 1
@@ -63,6 +70,30 @@ class RefreshCmd < BaseCmd
       @logger.info("Saved #{self.num_mods(num_added, "new")} in mod-data.json.")
     else
       @logger.info("No new entries.")
+    end
+  end
+
+  def update_disabled_mods
+    num_updated = 0
+
+    @logger.info("")
+    @logger.info("Checking for mods that were disabled in-game...")
+
+    @mod_data_helper.data.each_key do |uuid|
+      next if @modsettings_helper.data.at_css("attribute#UUID[value='#{uuid}']") ||
+              !@mod_data_helper.installed?(uuid)
+
+      @mod_data_helper.set_installed(uuid, is_installed: false)
+
+      num_updated += 1
+    end
+
+    if num_updated >= 1
+      @mod_data_helper.save
+
+      @logger.info("Updated #{self.num_mods(num_updated, "disabled")}.")
+    else
+      @logger.info("No mods were updated.")
     end
   end
 end

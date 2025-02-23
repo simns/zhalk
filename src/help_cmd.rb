@@ -13,7 +13,7 @@ class HelpCmd
         init            Initialize the environment with necessary files and folders.
         install         Install mods (.zip) from the 'mods' directory here.
         list            List installed mods.
-        refresh         Load in mods from the game's 'modsettings.lsx' file.
+        refresh         Sync up mods with the modsettings.lsx file.
         reorder         Reorder installed mods.
         activate        Activate a mod that has been deactivated.
         deactivate      Deactivate a mod so that it is not loaded into the game.

@@ -49,8 +49,10 @@ Usage:
 This command is used to read mods installed with the In-game Mod Manager.
 These mods appear in the game's `modsettings.lsx` file.
 Using this command will read that file and add entries to the `mod-data.json` file.
-
 If the entry already exists in `mod-data.json`, it is skipped.
+
+This command will also check for mods set to "installed" in the `mod-data.json` file and make sure their entries are in the game's `modsettings.lsx` file.
+If not, they are set to be disabled.
 
 ### Reorder
 

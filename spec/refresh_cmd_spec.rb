@@ -180,5 +180,73 @@ RSpec.describe RefreshCmd do
         expect(mod_data.keys.size).to eq(1)
       end
     end
+
+    context "when there are some mods that are disabled in modsettings.lsx" do
+      before do
+        File.write("mod-data.json", {
+          "97b49e95-5fa4-4912-b02d-ccf25ea176fe" => {
+            "is_installed" => true,
+            "mod_name" => "Disabled mod",
+            "uuid" => "97b49e95-5fa4-4912-b02d-ccf25ea176fe",
+            "number" => 1,
+            "created_at" => Time.now.to_s,
+            "updated_at" => Time.now.to_s
+          }
+        }.to_json)
+        File.write(
+          "modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Enabled mod"/>
+                          <attribute id="MD5" type="LSString" value="3112eaf64d4fabdc282b079e8fe06fdc"/>
+                          <attribute id="Name" type="LSString" value="Enabled mod"/>
+                          <attribute id="PublishHandle" type="uint64" value=""/>
+                          <attribute id="UUID" type="guid" value="03262688-5c2f-4259-9680-a050a1baf20e"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
+
+        refresh_cmd.run
+      end
+
+      it "adds the new enabled mod" do
+        expect(JSON.parse(File.read("mod-data.json"))).to include({
+          "03262688-5c2f-4259-9680-a050a1baf20e" => hash_including({
+            "is_installed" => true,
+            "mod_name" => "Enabled mod",
+            "uuid" => "03262688-5c2f-4259-9680-a050a1baf20e",
+            "number" => 2
+          })
+        })
+      end
+
+      it "disables the existing mod" do
+        mod_data = JSON.parse(File.read("mod-data.json"))
+        expect(mod_data).to include({
+          "97b49e95-5fa4-4912-b02d-ccf25ea176fe" => hash_including({
+            "is_installed" => false,
+            "mod_name" => "Disabled mod",
+            "uuid" => "97b49e95-5fa4-4912-b02d-ccf25ea176fe",
+            "number" => 1
+          })
+        })
+        expect(mod_data.keys.size).to eq(2)
+      end
+    end
   end
 end
