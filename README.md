@@ -20,57 +20,57 @@ The version I used for this project is in the `.tool-versions` and `.ruby-versio
 
 ## Setup
 
-Clone this repo.
+1. Clone this repo.
 
-```
-git clone git@github.com:simns/zhalk.git
-```
+   ```
+   git clone git@github.com:simns/zhalk.git
+   ```
 
-cd into the repo.
+1. cd into the repo.
 
-```
-cd zhalk
-```
+   ```
+   cd zhalk
+   ```
 
-Install the `bundler` gem.
+1. Install the `bundler` gem.
 
-```
-gem install bundler
-```
+   ```
+   gem install bundler
+   ```
 
-Use bundler to install the required gems.
+1. Use bundler to install the required gems.
 
-```
-bundle install
-```
+   ```
+   bundle install
+   ```
 
 ## Get started
 
-Zhalk uses a few files and folders to manage the mods. Initialize them with this command:
+1. Zhalk uses a few files and folders to manage the mods. Initialize them with this command:
 
-```sh
-./zhalk init
-```
+   ```sh
+   ./zhalk init
+   ```
 
-Edit the configuration file: `conf.toml` and input your Baldur's Gate 3 AppData directory.
+1. Edit the configuration file: `conf.toml` and input your Baldur's Gate 3 AppData directory.
 
-Next, move your mods as `.zip` files into this project's `mods` folder. Then install them with:
+1. Next, move your mods as `.zip` files into the newly created `mods` folder. Then, install the mods with:
 
-```sh
-./zhalk install
-```
+   ```sh
+   ./zhalk install
+   ```
 
-If you have existing mods in the game's `modsettings.lsx` file, read them in with:
+   If you have existing mods in the game's `modsettings.lsx` file, read them in with:
 
-```sh
-./zhalk refresh
-```
+   ```sh
+   ./zhalk refresh
+   ```
 
-To see all the mods you have installed, run:
+   To see all the mods you have installed, run:
 
-```sh
-./zhalk list
-```
+   ```sh
+   ./zhalk list
+   ```
 
 That's the basic usage!
 
