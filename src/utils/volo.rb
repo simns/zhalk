@@ -16,11 +16,11 @@ class Volo < Logger
   }.freeze
 
   def initialize
-    FileUtils.mkdir_p(Filepaths.root(Constants::LOGS_DIR))
+    FileUtils.mkdir_p(Filepaths.logs)
 
-    super(Filepaths.root(Constants::LOGS_DIR, "zhalk.log"), "daily")
+    super(Filepaths.logs("zhalk.log"), "daily")
 
-    @config_helper = ConfigHelper.new
+    @config_helper = ConfigHelper.new(ignore_not_found: true)
   end
 
   def config

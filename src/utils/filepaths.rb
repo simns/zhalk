@@ -18,4 +18,8 @@ class Filepaths
   def self.mods(*fileparts)
     return File.join(ROOT_DIR, Constants::MODS_DIR, *fileparts)
   end
+
+  def self.logs(*fileparts)
+    return File.join(ROOT_DIR, Constants::LOGS_DIR, *fileparts)
+  end
 end

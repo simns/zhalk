@@ -15,7 +15,8 @@ RSpec.describe InitCmd do
     before do
       stub_const("ROOT_DIR", ".")
 
-      allow(Volo).to receive(:new).and_return(spy)
+      FileUtils.mkdir(Constants::LOGS_DIR)
+      File.write(File.join(Constants::LOGS_DIR, "zhalk.log"), "")
 
       FileUtils.touch("conf.toml.template")
     end
@@ -35,7 +36,17 @@ RSpec.describe InitCmd do
 
     context "when all init items are present" do
       before do
-        FileUtils.touch("conf.toml")
+        File.write(
+          "conf.toml",
+          <<~CONF
+            [paths]
+            appdata_dir = "."
+
+            [logging]
+            log_level = "info"
+            log_level_in_stdout = false
+          CONF
+        )
 
         FileUtils.mkdir("mods")
         FileUtils.mkdir("dump")
