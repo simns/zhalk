@@ -72,7 +72,15 @@ The version I used for this project is in the `.tool-versions` and `.ruby-versio
    ./zhalk list
    ```
 
+   To change the load order for any mods, run:
+
+   ```sh
+   ./zhalk reorder
+   ```
+
 That's the basic usage!
+
+You can add this folder to your `PATH` and call `zhalk` from anywhere as well.
 
 ### Further docs
 
