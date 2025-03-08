@@ -248,5 +248,62 @@ RSpec.describe RefreshCmd do
         expect(mod_data.keys.size).to eq(2)
       end
     end
+
+    context "when there are some mods that are enabled in modsettings.lsx" do
+      before do
+        File.write("mod-data.json", {
+          "79fb9cf3-6f30-45e8-8738-b0752734eaa5" => {
+            "is_installed" => false,
+            "mod_name" => "Should be enabled",
+            "uuid" => "79fb9cf3-6f30-45e8-8738-b0752734eaa5",
+            "number" => 1,
+            "created_at" => Time.now.to_s,
+            "updated_at" => Time.now.to_s
+          }
+        }.to_json)
+        File.write(
+          "modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Should be enabled"/>
+                          <attribute id="MD5" type="LSString" value="3112eaf64d4fabdc282b079e8fe06fdc"/>
+                          <attribute id="Name" type="LSString" value="Should be enabled"/>
+                          <attribute id="PublishHandle" type="uint64" value=""/>
+                          <attribute id="UUID" type="guid" value="79fb9cf3-6f30-45e8-8738-b0752734eaa5"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
+
+        refresh_cmd.run
+      end
+
+      it "sets the mod as enabled" do
+        mod_data = JSON.parse(File.read("mod-data.json"))
+        expect(mod_data).to include({
+          "79fb9cf3-6f30-45e8-8738-b0752734eaa5" => hash_including({
+            "is_installed" => true,
+            "mod_name" => "Should be enabled",
+            "uuid" => "79fb9cf3-6f30-45e8-8738-b0752734eaa5",
+            "number" => 1
+          })
+        })
+        expect(mod_data.keys.size).to eq(1)
+      end
+    end
   end
 end

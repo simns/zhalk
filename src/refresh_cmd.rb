@@ -27,6 +27,8 @@ class RefreshCmd < BaseCmd
     self.load_mods_from_modsettings
 
     self.update_disabled_mods
+
+    self.update_enabled_mods
   end
 
   def load_mods_from_modsettings
@@ -80,7 +82,7 @@ class RefreshCmd < BaseCmd
     @logger.info("Checking for mods that were disabled in-game...")
 
     @mod_data_helper.data.each_key do |uuid|
-      next if @modsettings_helper.data.at_css("attribute#UUID[value='#{uuid}']") ||
+      next if @modsettings_helper.has?(uuid) ||
               !@mod_data_helper.installed?(uuid)
 
       @mod_data_helper.set_installed(uuid, is_installed: false)
@@ -92,6 +94,30 @@ class RefreshCmd < BaseCmd
       @mod_data_helper.save
 
       @logger.info("Updated #{self.num_mods(num_updated, "disabled")}.")
+    else
+      @logger.info("No mods were updated.")
+    end
+  end
+
+  def update_enabled_mods
+    num_updated = 0
+
+    @logger.info("")
+    @logger.info("Checking for mods that were enabled in-game...")
+
+    @mod_data_helper.data.each_key do |uuid|
+      next if !@modsettings_helper.has?(uuid) ||
+              @mod_data_helper.installed?(uuid)
+
+      @mod_data_helper.set_installed(uuid)
+
+      num_updated += 1
+    end
+
+    if num_updated >= 1
+      @mod_data_helper.save
+
+      @logger.info("Updated #{self.num_mods(num_updated, "enabled")}.")
     else
       @logger.info("No mods were updated.")
     end

@@ -17,6 +17,14 @@ class ModsettingsHelper < BaseHelper
     return @data
   end
 
+  def has?(uuid)
+    return !!self.mod_entry(uuid)
+  end
+
+  def mod_entry(uuid)
+    return self.data.at_css("attribute#UUID[value='#{uuid}']")&.parent
+  end
+
   def save(doc = nil, log_level: :debug)
     File.open(@filepath, "w") do |f|
       if doc

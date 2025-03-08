@@ -60,12 +60,11 @@ class DeactivateCmd < BaseCmd
   end
 
   def create_xml_backup(target_uuid)
-    uuid_attribute = @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']")
-    if uuid_attribute.nil?
+    if !@modsettings_helper.has?(target_uuid)
       raise "Could not find mod entry in modsettings.lsx. Cannot proceed."
     end
 
-    mod_entry = uuid_attribute.parent
+    mod_entry = @modsettings_helper.mod_entry(target_uuid)
 
     File.write(
       Filepaths.inactive("#{target_uuid}.xml"),
@@ -76,7 +75,7 @@ class DeactivateCmd < BaseCmd
   end
 
   def remove_from_modsettings(target_uuid)
-    @modsettings_helper.data.at_css("attribute#UUID[value='#{target_uuid}']").parent.remove
+    @modsettings_helper.mod_entry(target_uuid).remove
 
     @modsettings_helper.save(log_level: :info)
   end
