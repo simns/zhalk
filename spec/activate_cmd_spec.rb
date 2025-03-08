@@ -518,5 +518,102 @@ RSpec.describe ActivateCmd do
         )
       end
     end
+
+    context "when the target mod has its entry in modsettings already" do
+      before do
+        File.write("mod-data.json", {
+          "695d36a1-a0b2-4c36-a00d-060ebd8b1645" => {
+            "is_installed" => false,
+            "mod_name" => "Test Mod",
+            "uuid" => "695d36a1-a0b2-4c36-a00d-060ebd8b1645",
+            "number" => 1,
+            "created_at" => Time.now.to_s,
+            "updated_at" => Time.now.to_s
+          }
+        }.to_json)
+        File.write("modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Test Folder"/>
+                          <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
+                          <attribute id="Name" type="LSString" value="Test Mod"/>
+                          <attribute id="UUID" type="guid" value="695d36a1-a0b2-4c36-a00d-060ebd8b1645"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
+
+        activate_cmd.run("1")
+      end
+
+      it "does not update modsettings.lsx" do
+        expect(File.read("modsettings.lsx")).to eq(
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="Test Folder"/>
+                          <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
+                          <attribute id="Name" type="LSString" value="Test Mod"/>
+                          <attribute id="UUID" type="guid" value="695d36a1-a0b2-4c36-a00d-060ebd8b1645"/>
+                          <attribute id="Version64" type="int64" value=""/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
+      end
+
+      it "updates mod-data.json" do
+        expect(JSON.parse(File.read("mod-data.json"))).to include({
+          "695d36a1-a0b2-4c36-a00d-060ebd8b1645" => hash_including({
+            "is_installed" => true,
+            "mod_name" => "Test Mod",
+            "uuid" => "695d36a1-a0b2-4c36-a00d-060ebd8b1645",
+            "number" => 1
+          })
+        })
+      end
+    end
   end
 end

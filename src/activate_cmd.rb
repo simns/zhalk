@@ -67,6 +67,11 @@ class ActivateCmd < BaseCmd
   end
 
   def load_inactive_into_modsettings(target_uuid)
+    if @modsettings_helper.has?(target_uuid)
+      @logger.warn("Modsettings entry already exists. Will update mod-data.json only.")
+      return
+    end
+
     inactive_mod_filepath = Filepaths.inactive("#{target_uuid}.xml")
     raise "Could not find inactive mod's backup xml file." if !File.exist?(inactive_mod_filepath)
 
