@@ -50,7 +50,7 @@ class RefreshCmd < BaseCmd
 
       @logger.debug("Found node: uuid: #{uuid}, name: \"#{name}\".")
 
-      if uuid == Constants::GUSTAV_DEV_UUID
+      if @modsettings_helper.gustav_uuid?(uuid)
         @logger.debug("Not importing the Gustav entry.")
         next
       end
@@ -87,6 +87,8 @@ class RefreshCmd < BaseCmd
 
       @mod_data_helper.set_installed(uuid, is_installed: false)
 
+      @logger.debug("Found node: uuid: #{uuid}, name: \"#{@mod_data_helper.name(uuid)}\".")
+
       num_updated += 1
     end
 
@@ -110,6 +112,8 @@ class RefreshCmd < BaseCmd
               @mod_data_helper.installed?(uuid)
 
       @mod_data_helper.set_installed(uuid)
+
+      @logger.debug("Found node: uuid: #{uuid}, name: \"#{@mod_data_helper.name(uuid)}\".")
 
       num_updated += 1
     end

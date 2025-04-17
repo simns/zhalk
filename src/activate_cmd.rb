@@ -89,7 +89,7 @@ class ActivateCmd < BaseCmd
     mods = mods.sort_by do |node|
       uuid = node.at("attribute#UUID")["value"]
 
-      next 0 if uuid == Constants::GUSTAV_DEV_UUID
+      next 0 if @modsettings_helper.gustav_uuid?(uuid)
 
       next @mod_data_helper.data.dig(uuid, "number") || 0
     end

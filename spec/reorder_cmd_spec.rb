@@ -245,6 +245,14 @@ RSpec.describe ReorderCmd do
                               <attribute id="UUID" type="guid" value="a8a472fb-e423-4315-b4e3-eeb0cf3af88d"/>
                               <attribute id="Version64" type="int64" value=""/>
                             </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="GustavX"/>
+                              <attribute id="MD5" type="LSString" value="180daa208a8a447d4ea7f6b4a47e93f1"/>
+                              <attribute id="Name" type="LSString" value="GustavX"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="cb555efe-2d9e-131f-8195-a89329d218ea"/>
+                              <attribute id="Version64" type="int64" value="36028797018963968"/>
+                            </node>
                           </children>
                         </node>
                       </children>
@@ -260,7 +268,8 @@ RSpec.describe ReorderCmd do
           end
 
           it "modifies mod-data.json to reflect new order" do
-            expect(JSON.parse(File.read("mod-data.json"))).to include({
+            mod_data = JSON.parse(File.read("mod-data.json"))
+            expect(mod_data).to include({
               "c366d5f3-2afc-41d0-b4ac-de15257384e0" => hash_including({
                 "is_installed" => true,
                 "mod_name" => "Existing mod",
@@ -274,9 +283,10 @@ RSpec.describe ReorderCmd do
                 "number" => 1
               })
             })
+            expect(mod_data.keys.size).to eq(2)
           end
 
-          it "modifies modsettings.lsx to reflect new order" do
+          it "modifies modsettings.lsx to reflect new order while gustav entries go to top" do
             expect(File.read("modsettings.lsx")).to eq(
               <<~XML
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -293,6 +303,14 @@ RSpec.describe ReorderCmd do
                               <attribute id="Name" type="LSString" value="GustavDev"/>
                               <attribute id="PublishHandle" type="uint64" value="0"/>
                               <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                              <attribute id="Version64" type="int64" value="36028797018963968"/>
+                            </node>
+                            <node id="ModuleShortDesc">
+                              <attribute id="Folder" type="LSString" value="GustavX"/>
+                              <attribute id="MD5" type="LSString" value="180daa208a8a447d4ea7f6b4a47e93f1"/>
+                              <attribute id="Name" type="LSString" value="GustavX"/>
+                              <attribute id="PublishHandle" type="uint64" value="0"/>
+                              <attribute id="UUID" type="guid" value="cb555efe-2d9e-131f-8195-a89329d218ea"/>
                               <attribute id="Version64" type="int64" value="36028797018963968"/>
                             </node>
                             <node id="ModuleShortDesc">

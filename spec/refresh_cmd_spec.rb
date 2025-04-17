@@ -76,6 +76,53 @@ RSpec.describe RefreshCmd do
       end
     end
 
+    context "when there are 'gustav' entries" do
+      before do
+        File.write("mod-data.json", "{}")
+        File.write(
+          "modsettings.lsx",
+          <<~XML
+            <?xml version="1.0" encoding="UTF-8"?>
+            <save>
+              <version major="4" minor="7" revision="1" build="300"/>
+              <region id="ModuleSettings">
+                <node id="root">
+                  <children>
+                    <node id="Mods">
+                      <children>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavDev"/>
+                          <attribute id="MD5" type="LSString" value=""/>
+                          <attribute id="Name" type="LSString" value="GustavDev"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavX"/>
+                          <attribute id="MD5" type="LSString" value="180daa208a8a447d4ea7f6b4a47e93f1"/>
+                          <attribute id="Name" type="LSString" value="GustavX"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="cb555efe-2d9e-131f-8195-a89329d218ea"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                      </children>
+                    </node>
+                  </children>
+                </node>
+              </region>
+            </save>
+          XML
+        )
+
+        refresh_cmd.run
+      end
+
+      it "skips any gustav entries" do
+        expect(File.read("mod-data.json")).to eq("{}")
+      end
+    end
+
     context "when there are mods in the modsettings file" do
       before do
         File.write("mod-data.json", "{}")

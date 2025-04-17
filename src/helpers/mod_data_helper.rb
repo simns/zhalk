@@ -20,6 +20,10 @@ class ModDataHelper < BaseHelper
     return @data
   end
 
+  def name(uuid)
+    return self.data.dig(uuid, "mod_name")
+  end
+
   def has?(uuid)
     return self.data.key?(uuid)
   end

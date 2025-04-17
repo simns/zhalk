@@ -43,6 +43,10 @@ class ModsettingsHelper < BaseHelper
     return File.join(config["paths"]["appdata_dir"], "PlayerProfiles", "Public")
   end
 
+  def gustav_uuid?(uuid)
+    return [Constants::GUSTAV_DEV_UUID, Constants::GUSTAVX_DEV_UUID].include?(uuid)
+  end
+
   private
 
   def get_modsettings

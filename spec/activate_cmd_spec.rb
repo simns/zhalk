@@ -66,6 +66,14 @@ RSpec.describe ActivateCmd do
                           <attribute id="UUID" type="guid" value="28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8"/>
                           <attribute id="Version64" type="int64" value="36028797018963968"/>
                         </node>
+                        <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavX"/>
+                          <attribute id="MD5" type="LSString" value="180daa208a8a447d4ea7f6b4a47e93f1"/>
+                          <attribute id="Name" type="LSString" value="GustavX"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="cb555efe-2d9e-131f-8195-a89329d218ea"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
                       </children>
                     </node>
                   </children>
@@ -109,6 +117,14 @@ RSpec.describe ActivateCmd do
                           <attribute id="Version64" type="int64" value="36028797018963968"/>
                         </node>
                         <node id="ModuleShortDesc">
+                          <attribute id="Folder" type="LSString" value="GustavX"/>
+                          <attribute id="MD5" type="LSString" value="180daa208a8a447d4ea7f6b4a47e93f1"/>
+                          <attribute id="Name" type="LSString" value="GustavX"/>
+                          <attribute id="PublishHandle" type="uint64" value="0"/>
+                          <attribute id="UUID" type="guid" value="cb555efe-2d9e-131f-8195-a89329d218ea"/>
+                          <attribute id="Version64" type="int64" value="36028797018963968"/>
+                        </node>
+                        <node id="ModuleShortDesc">
                           <attribute id="Folder" type="LSString" value="Test Folder"/>
                           <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
                           <attribute id="Name" type="LSString" value="Test Mod"/>
@@ -130,16 +146,16 @@ RSpec.describe ActivateCmd do
           Constants::INACTIVE_DIR,
           "ad2a6207-4fbe-4e80-ba6e-e0b148367e7b.xml"
         ))).to eq(
-                           <<~XML
-                             <node id="ModuleShortDesc">
-                               <attribute id="Folder" type="LSString" value="Test Folder"/>
-                               <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
-                               <attribute id="Name" type="LSString" value="Test Mod"/>
-                               <attribute id="UUID" type="guid" value="ad2a6207-4fbe-4e80-ba6e-e0b148367e7b"/>
-                               <attribute id="Version64" type="int64" value=""/>
-                             </node>
-                           XML
-                         )
+          <<~XML
+            <node id="ModuleShortDesc">
+              <attribute id="Folder" type="LSString" value="Test Folder"/>
+              <attribute id="MD5" type="LSString" value="54c3136171518f973ad518b43f3f35ae"/>
+              <attribute id="Name" type="LSString" value="Test Mod"/>
+              <attribute id="UUID" type="guid" value="ad2a6207-4fbe-4e80-ba6e-e0b148367e7b"/>
+              <attribute id="Version64" type="int64" value=""/>
+            </node>
+          XML
+        )
       end
 
       it "sets the mod as installed in mod-data.json" do
